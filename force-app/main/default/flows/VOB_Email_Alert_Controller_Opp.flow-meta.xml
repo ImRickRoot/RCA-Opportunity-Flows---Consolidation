@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to vob@recoverycoa.com when a Verification of Benefits (VOB) is updated for a Monroeville facility opportunity. The email includes opportunity number, facility, and patient name to allow the VOB team to quickly locate and process the updated insurance information. This notification ensures timely VOB processing for Monroeville admissions. Note: This is a legacy flow that should be consolidated with the VOB_Update_Avatar_Sync_Notification_Consolidated flow.</description>
+        <name>Monroeville_VOB_Updated</name>
+        <label>Notify VOB Team of Monroeville Update</label>
+        <locationX>50</locationX>
+        <locationY>551</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>vob@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Monroeville VOB Updated - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A Verification of Benefit has been updated for a Monroeville opportunity.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>51.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates which facility the VOB update is for. Currently only handles Monroeville - checks if Facility__c contains 'Monroeville' AND the prior value of Send_VOB_to_Avatar__c was FALSE (indicating this is the first time the VOB is being sent). If both conditions are met, sends email notification. This flow could be extended to handle other facilities. Note: Consider consolidation with the VOB_Update_Avatar_Sync_Notification_Consolidated flow which uses a metadata-driven approach.</description>
+        <name>VOB_Updated_for_Which_Facility</name>
+        <label>Is This a Monroeville VOB Update?</label>
+        <locationX>182</locationX>
+        <locationY>431</locationY>
+        <defaultConnectorLabel>No - End Flow</defaultConnectorLabel>
+        <rules>
+            <name>Monroeville</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>Monroeville</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record__Prior.Send_VOB_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Monroeville_VOB_Updated</targetReference>
+            </connector>
+            <label>Yes - Monroeville VOB</label>
+        </rules>
+    </decisions>
+    <description>EMAIL ALERT: Sends email notification to VOB team (vob@recoverycoa.com) when a Verification of Benefits is updated for Monroeville facility opportunities. Triggers after save when Send_VOB_to_Avatar__c becomes TRUE. Checks if Facility__c contains 'Monroeville' and if prior Send_VOB_to_Avatar__c was FALSE (first-time send). This specialized flow handles Monroeville VOB notifications separately from the consolidated VOB flow. Note: This is a legacy flow that could be consolidated into the VOB_Update_Avatar_Sync_Notification_Consolidated flow for consistency and easier maintenance. Keeping separate for now to maintain existing functionality. Refactored from Case to Opportunity object.</description>
+    <interviewLabel>VOB Email Alert Controller (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>VOB Email Alert Controller (Opp)</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries the Opportunity object to retrieve the full record including all fields needed for the email notification (Name, Facility__c, Account.Name). While the trigger provides $Record context, this explicit lookup ensures all related fields (like Account.Name) are accessible in the email template merge fields. Proceeds to check which facility the VOB update is for and sends appropriate notification.</description>
+        <name>Get_Opportunity_Info</name>
+        <label>Get Full Opportunity Details</label>
+        <locationX>182</locationX>
+        <locationY>311</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>VOB_Updated_for_Which_Facility</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Opportunity_Info</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Send_VOB_to_Avatar__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

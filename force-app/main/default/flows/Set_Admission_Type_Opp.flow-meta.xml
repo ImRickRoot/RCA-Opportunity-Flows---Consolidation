@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Sets the Admission_Type__c field to 'Readmission' when the patient has been discharged from a previous admission within the last 180 days. This designation is important for clinical tracking, insurance billing, and quality metrics as readmissions within 180 days may have different treatment protocols and reimbursement considerations.</description>
+        <name>Readmission2</name>
+        <label>Readmission</label>
+        <locationX>314</locationX>
+        <locationY>503</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Admission_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Readmission</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Sets the Admission_Type__c field to 'First Time Admission' when either: (1) no previous admission exists, (2) the previous admission was more than 180 days ago, or (3) the previous admission was a level of care transfer (IP to OP step-down or OP to IP step-up). This designation is critical for intake processes, treatment planning, and insurance authorization requirements.</description>
+        <name>Set_First_Time_Admission</name>
+        <label>Set First Time Admission</label>
+        <locationX>50</locationX>
+        <locationY>503</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Admission_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>First Time Admission</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Evaluates the patient's admission history to determine if this is a 'First Time Admission' or 'Readmission'. Considers: (1) time since last discharge (180-day threshold), (2) whether a previous admission exists, (3) whether the previous admission was a level of care transfer. First Time Admission applies if: no previous admission exists, OR previous discharge was >180 days ago, OR previous admission was an IP/OP transfer. Readmission applies if: previous discharge was ≤180 days ago AND it was not a transfer. This classification drives clinical protocols, insurance requirements, and quality reporting.</description>
+        <name>Determine_Admission_Type</name>
+        <label>Determine Admission Type</label>
+        <locationX>314</locationX>
+        <locationY>395</locationY>
+        <defaultConnectorLabel>Default Outcome - No Action</defaultConnectorLabel>
+        <rules>
+            <name>First_Time_Admission</name>
+            <conditionLogic>(1 AND (2 OR 3)) OR ((2 OR 3) AND (4 OR 5)) OR 6</conditionLogic>
+            <conditions>
+                <leftValueReference>CalculateDays</leftValueReference>
+                <operator>GreaterThan</operator>
+                <rightValue>
+                    <numberValue>180.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted to Outpatient</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Transfer_from_LOC__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>IP to OP Step-down</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Transfer_from_LOC__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>OP to IP Step-up</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Name</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_First_Time_Admission</targetReference>
+            </connector>
+            <label>First Time Admission</label>
+        </rules>
+        <rules>
+            <name>Readmission1</name>
+            <conditionLogic>1 AND (2 OR 3) AND 4</conditionLogic>
+            <conditions>
+                <leftValueReference>CalculateDays</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <numberValue>180.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted to Outpatient</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Discharge_Datecc__c</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Readmission2</targetReference>
+            </connector>
+            <label>Readmission</label>
+        </rules>
+    </decisions>
+    <description>CALCULATION: Automatically determines and sets the Admission_Type__c field ('First Time Admission' vs 'Readmission') based on the patient's admission history. Triggers before save when an opportunity's stage changes to 'Admitted' or 'Admitted to Outpatient'. Queries previous admissions for the same patient account, calculates days since last discharge, and applies business rules: First Time if >180 days since last discharge, no previous admission exists, or previous admission was an IP/OP transfer; Readmission if ≤180 days since last discharge. This classification is critical for clinical protocols, insurance authorization, and quality metrics. Refactored from Case to Opportunity object.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula that calculates the number of days between the current admission date and the patient's previous discharge date. Subtracts the previous opportunity's Discharge_Datecc__c from the current record's Admission_Date__c. This calculation is used in the decision element to determine if the patient qualifies as a 'Readmission' (≤180 days) or 'First Time Admission' (>180 days). Returns an integer representing the number of days elapsed.</description>
+        <name>CalculateDays</name>
+        <dataType>Number</dataType>
+        <expression>{!$Record.Admission_Date__c} - {!Get_Previous_Admission_Opp.Discharge_Datecc__c}</expression>
+        <scale>0</scale>
+    </formulas>
+    <interviewLabel>Set Admission Type (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Set Admission Type (Opp)</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries the Opportunity object to find the patient's most recent previous admission. Searches for opportunities on the same Account (same patient) where the Stage is 'Admitted' or 'Admitted to Outpatient' and excludes the current opportunity record. Sorts by Name descending to get the most recent record. Returns the previous opportunity's Discharge_Datecc__c, StageName, and Transfer_from_LOC__c fields, which are used to determine if this is a readmission or first-time admission. If no previous admission exists, the decision logic will classify this as a first-time admission.</description>
+        <name>Get_Previous_Admission_Opp</name>
+        <label>Get Previous Admission Opportunity</label>
+        <locationX>314</locationX>
+        <locationY>287</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Determine_Admission_Type</targetReference>
+        </connector>
+        <filterLogic>1 AND 2 AND (3 OR 4)</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Id</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted to Outpatient</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <sortField>Name</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>188</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Previous_Admission_Opp</targetReference>
+        </connector>
+        <filterLogic>1 AND 4 AND (2 OR 3)</filterLogic>
+        <filters>
+            <field>StageName</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted to Outpatient</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Admission_Date__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

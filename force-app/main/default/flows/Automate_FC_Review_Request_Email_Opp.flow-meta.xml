@@ -1,0 +1,1176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Automate_FC_Review_Request</name>
+        <label>Automate FC Review Request</label>
+        <locationX>1892</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestEmailBBH</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_for_CR</name>
+        <label>Automate FC Review Request for CR</label>
+        <locationX>2156</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestCR</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_Danvers</name>
+        <label>Automate FC Review Request For Danvers</label>
+        <locationX>2420</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestforDanvers</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_INDY</name>
+        <label>Automate FC Review Request For INDY</label>
+        <locationX>3212</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestForINDY</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_LH</name>
+        <label>Automate FC Review Request For LH</label>
+        <locationX>3476</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestForLH</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_RB</name>
+        <label>Automate FC Review Request For RB</label>
+        <locationX>4004</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestForRB</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_St_Charles</name>
+        <label>Automate FC Review Request For St.Charles</label>
+        <locationX>4268</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFCReviewRequestForStCharles</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>Automate_FC_Review_Request_For_Westminister</name>
+        <label>Automate FC Review Request For Westminister</label>
+        <locationX>4532</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomatFacilityClearanceReviewRequestForWestminister</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>AutomateFCReviewRequestforDevon</name>
+        <label>AutomateFCReviewRequestforDevon</label>
+        <locationX>2684</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestDevon</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>AutomateFCReviewRequestForGreenville</name>
+        <label>AutomateFCReviewRequestForGreenville</label>
+        <locationX>2948</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestForGreenville</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <actionCalls>
+        <name>AutomateFCReviewRequestForMonroeville</name>
+        <label>Automate FC Review Request For Monroeville</label>
+        <locationX>3740</locationX>
+        <locationY>863</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddressesArray</name>
+            <value>
+                <elementReference>EmailList</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Facility Clearance Record Review Request - {!$Record.Account.FirstName} {!$Record.Account.LastName}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>AutomateFacilityClearanceReviewRequestForMonroeville</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>58.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Assign_Email_to_BBH</name>
+        <label>Assign Email to BBH</label>
+        <locationX>1892</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>nfletcher@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>bmaynard@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_CR</name>
+        <label>Assign Email to CR</label>
+        <locationX>2156</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>masmith@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>tspears@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_for_CR</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Danvers</name>
+        <label>Assign Email to Danvers</label>
+        <locationX>2420</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>j.pinette@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>enaparstek@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>cquinn@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_Danvers</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Devon</name>
+        <label>Assign Email to Devon</label>
+        <locationX>2684</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>nlangnas@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>bvail@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>r.friedman@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>AutomateFCReviewRequestforDevon</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Greenville</name>
+        <label>Assign Email to Greenville</label>
+        <locationX>2948</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>l.goodnough@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>t.gordon@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>AutomateFCReviewRequestForGreenville</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Indy</name>
+        <label>Assign Email to Indy</label>
+        <locationX>3212</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>c.schultz@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>pamela.simmons@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_INDY</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_LH</name>
+        <label>Assign Email to LH</label>
+        <locationX>3476</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>dacurry@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>crichey@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_LH</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Monroeville</name>
+        <label>Assign Email to Monroeville</label>
+        <locationX>3740</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>d.blenk@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>gburkett@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>AutomateFCReviewRequestForMonroeville</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_RB</name>
+        <label>Assign Email to RB</label>
+        <locationX>4004</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>lognibene@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>adelucia@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_RB</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_St_Charles</name>
+        <label>Assign Email to St. Charles</label>
+        <locationX>4268</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>kwolownikalbert@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_St_Charles</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Email_to_Westminster</name>
+        <label>Assign Email to Westminster</label>
+        <locationX>4532</locationX>
+        <locationY>755</locationY>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>a.pitts@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>EmailList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>sproctor@recoverycoa.com</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Automate_FC_Review_Request_For_Westminister</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Check_Discharge_Type</name>
+        <label>Check Discharge Type</label>
+        <locationX>176</locationX>
+        <locationY>323</locationY>
+        <defaultConnector>
+            <targetReference>Get_Fc_Record</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>If_Yes</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Discharge_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Administrative Discharge</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Discharge_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Against Advice</stringValue>
+                </rightValue>
+            </conditions>
+            <label>If Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>CheckRegion</name>
+        <label>CheckRegion</label>
+        <locationX>3344</locationX>
+        <locationY>647</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>IsBBH</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_BBH</targetReference>
+            </connector>
+            <label>IsBBH</label>
+        </rules>
+        <rules>
+            <name>IsCR</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_CR</targetReference>
+            </connector>
+            <label>IsCR</label>
+        </rules>
+        <rules>
+            <name>IsDanvers</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Danvers</targetReference>
+            </connector>
+            <label>IsDanvers</label>
+        </rules>
+        <rules>
+            <name>IsDevon</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Devon</targetReference>
+            </connector>
+            <label>IsDevon</label>
+        </rules>
+        <rules>
+            <name>IsGreenville</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Greenville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Greenville (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Greenville</targetReference>
+            </connector>
+            <label>IsGreenville</label>
+        </rules>
+        <rules>
+            <name>IsIndy</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (OP MH/ED)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Indy</targetReference>
+            </connector>
+            <label>IsIndy</label>
+        </rules>
+        <rules>
+            <name>IsLighthouse</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lighthouse (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lighthouse at Mays Landing (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_LH</targetReference>
+            </connector>
+            <label>IsLighthouse</label>
+        </rules>
+        <rules>
+            <name>IsMonroeville</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Monroeville</targetReference>
+            </connector>
+            <label>IsMonroeville</label>
+        </rules>
+        <rules>
+            <name>IsRaritanBay</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Raritan Bay (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Raritan Bay (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_RB</targetReference>
+            </connector>
+            <label>IsRaritanBay</label>
+        </rules>
+        <rules>
+            <name>IsSt_Charles</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_St_Charles</targetReference>
+            </connector>
+            <label>IsSt. Charles</label>
+        </rules>
+        <rules>
+            <name>IsWestminster</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Westminster (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Iterate_through_Active_FC.FacilityName__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Westminster (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Email_to_Westminster</targetReference>
+            </connector>
+            <label>IsWestminster</label>
+        </rules>
+    </decisions>
+    <description>Refactored from Case to Opportunity - Sends facility-specific review request emails when an Opportunity is discharged with certain discharge types</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>BaseURL</name>
+        <dataType>String</dataType>
+        <expression>LEFT({!$Api.Partner_Server_URL_260}, FIND( &apos;/services&apos;, {!$Api.Partner_Server_URL_260}))</expression>
+    </formulas>
+    <interviewLabel>Automate FC Review Request Email (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Automate FC Review Request Email (Opp)</label>
+    <loops>
+        <name>Iterate_through_Active_FC</name>
+        <label>Iterate through Active FC</label>
+        <locationX>1804</locationX>
+        <locationY>539</locationY>
+        <collectionReference>Get_Fc_Record</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>CheckRegion</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Fc_Record</name>
+        <label>Get Fc Record</label>
+        <locationX>1804</locationX>
+        <locationY>431</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Iterate_through_Active_FC</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Account__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Status__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Active</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>Facility_Clearance__c</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_Discharge_Type</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Discharge_Datecc__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestCR</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Marcus Smith/Thomas Jay Spears,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+RCA Corporate Team.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestDevon</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Ross Friedman/Bridgette Vail/Noah Langnas,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestEmailBBH</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Blythe Maynard/Nicole Fletcher,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient:
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+RCA Corporate Team.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestforDanvers</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Jameson Pinette/Eli Naparstek/Cheryl Quinn,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} 
+{!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type:{!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestForGreenville</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Lisa Goodnough,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestForINDY</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Christine Schultz/Pam Simmons,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely,
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestForLH</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Corey Richie/David Curry,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient:
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestForMonroeville</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear David Blenk/Gina Burkett,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFacilityClearanceReviewRequestForRB</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear LeoDante Ognibene/Andrea DeLucia,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient: 
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomateFCReviewRequestForStCharles</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Karen Wolownik,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient:
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <textTemplates>
+        <name>AutomatFacilityClearanceReviewRequestForWestminister</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Dear Amanda Pitts/Sarah Morse,
+
+We kindly request your review of the Facility Clearance (FC) record for the recently discharged patient, {!$Record.Account.FirstName} {!$Record.Account.LastName}, on {!$Record.Discharge_Datecc__c} from {!$Record.Facility__c} with the following discharge type: {!$Record.Discharge_Type__c}. Please click the link below to access the FC record for this patient:
+
+Facility Clearance record: {!BaseURL}/lightning/r/Facility_Clearance__c/{!Iterate_through_Active_FC.Id}/view
+Account record: {!BaseURL}/lightning/r/Account/{!Iterate_through_Active_FC.Account__c}/view
+
+If the patient no longer requires Facility Clearance, please remove the record from Salesforce manually and update notes accordingly.
+
+Thank you for your prompt attention to this matter.
+
+Sincerely, 
+RCA Corporate Team</text>
+    </textTemplates>
+    <variables>
+        <name>EmailList</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

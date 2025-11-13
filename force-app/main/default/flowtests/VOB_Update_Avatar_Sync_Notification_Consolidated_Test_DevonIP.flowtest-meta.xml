@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests VOB_Update_Avatar_Sync_Notification_Consolidated when Send_VOB_to_Avatar__c is checked for Devon (IP) facility.</description>
+    <flowApiName>VOB_Update_Avatar_Sync_Notification_Consolidated</flowApiName>
+    <label>VOB Update Avatar Sync - Devon IP</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - VOB Devon IP&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Devon (IP)&quot;,&quot;Send_VOB_to_Avatar__c&quot;:false}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - VOB Devon IP&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Devon (IP)&quot;,&quot;Send_VOB_to_Avatar__c&quot;:true}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Send_VOB_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

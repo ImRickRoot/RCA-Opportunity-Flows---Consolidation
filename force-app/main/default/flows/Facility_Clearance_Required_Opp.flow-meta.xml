@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>51.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates the Discharge_Type__c and Secondary_Discharge_Type__c to determine if the patient requires facility clearance before being readmitted. Two types of administrative discharges trigger clearance: (1) Serious behavioral issues (Physical/Sexual Violence, Distribution of Substances, Illegal Activity) - applicable to all levels of care, and (2) OP/MAT-specific issues (Refusing higher level of care, Digital Health Platform misconduct) - applicable only to outpatient programs. If either condition is met, flags the patient's Account. If neither, the flow ends without action.</description>
+        <name>Does_Discharge_Type_Require_Additional_Action</name>
+        <label>Does Discharge Require Facility Clearance?</label>
+        <locationX>314</locationX>
+        <locationY>311</locationY>
+        <defaultConnectorLabel>No Clearance Required</defaultConnectorLabel>
+        <rules>
+            <name>Facility_Clearance_Required_Discharge</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Discharge_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Administrative Discharge</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Secondary_Discharge_Type__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>Physical Violence, Sexual Violence, Distribution of Substances in Facility, Engaged in Illegal Activity in Facility</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_PersonAccount_w_Facility_Clearance_Requirement</targetReference>
+            </connector>
+            <label>Serious Behavioral Issues (All LOC)</label>
+        </rules>
+        <rules>
+            <name>Outpatient_or_MAT_specific_Discharge</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Discharge_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Administrative Discharge</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Secondary_Discharge_Type__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>Requires HLOC and is refusing, Inappropriate Behavior on Digital Health Platform</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_PersonAccount_w_Facility_Clearance_Requirement_0</targetReference>
+            </connector>
+            <label>OP/MAT-Specific Issues</label>
+        </rules>
+    </decisions>
+    <description>BUSINESS PROCESS: Flags patient accounts that require facility clearance before readmission based on specific administrative discharge reasons. Triggers when Discharge_Type__c changes to 'Administrative Discharge'. Sets Patient_Account_Flag__c to TRUE on the Account for two categories: (1) Serious behavioral issues (violence, substances, illegal activity) applicable to all programs, and (2) OP/MAT-specific issues (refusing higher level of care, digital platform misconduct). This flag prevents automatic readmission and requires manual clearance review, protecting facility safety and ensuring appropriate care level. Replaces legacy Process Builder with more granular discharge type handling. Refactored from Case to Opportunity object.</description>
+    <interviewLabel>Facility Clearance Required (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Facility Clearance Required (Opp)</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the patient's Account record by setting Patient_Account_Flag__c to TRUE when the discharge involves serious behavioral issues (violence, substances, illegal activity). This flag is visible throughout the system and alerts admissions staff that the patient cannot be automatically readmitted and requires facility clearance review before any future admission. The flag remains on the account until manually cleared by authorized personnel after appropriate review and approval.</description>
+        <name>Update_PersonAccount_w_Facility_Clearance_Requirement</name>
+        <label>Flag Account for Serious Behavioral Issues</label>
+        <locationX>50</locationX>
+        <locationY>431</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Patient_Account_Flag__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Updates the patient's Account record by setting Patient_Account_Flag__c to TRUE when the discharge involves OP/MAT-specific issues (refusing higher level of care, digital health platform misconduct). This flag alerts outpatient and MAT program admissions staff that the patient cannot be automatically readmitted to outpatient programs and requires facility clearance review. The flag remains until manually cleared by authorized personnel after appropriate review.</description>
+        <name>Update_PersonAccount_w_Facility_Clearance_Requirement_0</name>
+        <label>Flag Account for OP/MAT-Specific Issues</label>
+        <locationX>314</locationX>
+        <locationY>431</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Patient_Account_Flag__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <object>Account</object>
+    </recordUpdates>
+    <start>
+        <locationX>188</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Does_Discharge_Type_Require_Additional_Action</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Discharge_Type__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Administrative Discharge</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

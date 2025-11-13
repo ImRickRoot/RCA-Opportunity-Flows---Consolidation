@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Auto_Close_Med_Approvals_on_Opp_Closure when opportunity stage changes to Closed - should close related med approvals.</description>
+    <flowApiName>Auto_Close_Med_Approvals_on_Opp_Closure</flowApiName>
+    <label>Auto Close Med Approvals - Opp Closed</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Close Med Approvals&quot;,&quot;StageName&quot;:&quot;Admitted&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Close Med Approvals&quot;,&quot;StageName&quot;:&quot;Closed&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

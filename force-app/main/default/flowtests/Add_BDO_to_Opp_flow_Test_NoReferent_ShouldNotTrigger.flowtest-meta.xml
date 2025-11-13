@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Add_BDO_to_Opp_flow when opportunity is created without Referent - flow should not trigger.</description>
+    <flowApiName>Add_BDO_to_Opp_flow</flowApiName>
+    <label>Add BDO to Opp - No Referent (No Trigger)</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - No Referent&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Name</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Test Opportunity - No Referent</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

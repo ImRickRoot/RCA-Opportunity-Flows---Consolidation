@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Calculate_Days_Since_Last_Prior_Discharge_Opp when Admission_Date__c changes for IP facility - should calculate days since last IP discharge.</description>
+    <flowApiName>Calculate_Days_Since_Last_Prior_Discharge_Opp</flowApiName>
+    <label>Calculate Days Since Discharge - IP Facility</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - IP Days&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (IP)&quot;}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - IP Days&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (IP)&quot;,&quot;Admission_Date__c&quot;:&quot;2025-11-15&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>(IP)</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

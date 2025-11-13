@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>54.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Checks if the prior stage was 'Closed' to confirm this is truly a reopening event (not just a regular stage transition). If the previous StageName was 'Closed' and the new stage is an open stage, this is a reopening and the flow proceeds to timestamp it and restore CMAs. If the prior stage was not 'Closed', this is just a normal stage change and the flow exits without action. This decision prevents false positives and ensures the reopening logic only fires for actual reopen scenarios.</description>
+        <name>Only_Closed_Opportunities</name>
+        <label>Was Prior Stage Closed?</label>
+        <locationX>182</locationX>
+        <locationY>335</locationY>
+        <defaultConnectorLabel>Not a Reopening - Exit</defaultConnectorLabel>
+        <rules>
+            <name>Include</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record__Prior.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Opportunity_ReOpen_DT</targetReference>
+            </connector>
+            <label>Yes - This is a Reopening</label>
+        </rules>
+    </decisions>
+    <description>BUSINESS PROCESS: Timestamps when a closed opportunity is reopened AND restores related Med Approval statuses to their pre-closure values. Triggers after save when StageName changes from 'Closed' to an open stage (Open Case, VOB Submitted, Assessment Complete, Pending Schedule, Scheduled for Admission, VOB Completed). Stamps Case_Re_Opened_DT__c with current date/time, then finds CMAs that were 'Closed via Opportunity' and restores their Approval_Status__c and Review_Type__c from the Pre-Closure backup fields. This two-part process ensures: (1) reopening events are tracked for reporting, and (2) Med Approvals automatically reactivate when opportunities reopen, maintaining workflow continuity. Critical for audit trail and preventing orphaned Med Approval records. Refactored from Case to Opportunity object. Modified 5/16 to After-Save flow for CMA updates, enhanced 5/17 to restore prior CMA values.</description>
+    <formulas>
+        <description>Formula that returns the current date and time using the NOW() function. This timestamp captures the exact moment when the opportunity was reopened from Closed status. Stamps the Case_Re_Opened_DT__c field to create an audit trail of reopening events. Used for reporting on opportunity lifecycle, tracking how often opportunities are reopened, and understanding case management workflows. Returns a DateTime value.</description>
+        <name>varNOW</name>
+        <dataType>DateTime</dataType>
+        <expression>NOW()</expression>
+    </formulas>
+    <interviewLabel>Opportunity Re-Open DT Stamp {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity Re-Open DT Stamp</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries for Med Approval (CMA) records that were auto-closed when this opportunity was closed. Searches for CMAs where: (1) Opportunity__c matches this opportunity, and (2) Review_Type__c = 'Closed via Opportunity'. Returns the most recent CMA (sorted by CreatedDate desc). Retrieves the Pre-Closure backup fields (Approval_Status_Pre_Closure__c and Review_Type_Pre_Closure__c) which contain the statuses that existed before auto-closure. These values will be restored to reactivate the Med Approval when the opportunity reopens.</description>
+        <name>Get_CMAs</name>
+        <label>Find Auto-Closed Med Approvals</label>
+        <locationX>50</locationX>
+        <locationY>575</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Update_CMAs</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Opportunity__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Review_Type__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Closed via Opportunity</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Case_Med_Approval__c</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Restores the Med Approval to its pre-closure status by copying the backup values from Approval_Status_Pre_Closure__c and Review_Type_Pre_Closure__c back into the active Approval_Status__c and Review_Type__c fields. This reactivation ensures the Med Approval returns to its previous state (e.g., 'In Progress', 'Pending Review') when the opportunity reopens, maintaining workflow continuity and preventing the need to manually reopen Med Approvals. Critical for seamless opportunity lifecycle management.</description>
+        <name>Update_CMAs</name>
+        <label>Restore Med Approval to Pre-Closure Status</label>
+        <locationX>50</locationX>
+        <locationY>695</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_CMAs.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Approval_Status__c</field>
+            <value>
+                <elementReference>Get_CMAs.Approval_Status_Pre_Closure__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Review_Type__c</field>
+            <value>
+                <elementReference>Get_CMAs.Review_Type_Pre_Closure__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Case_Med_Approval__c</object>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Updates the opportunity's Case_Re_Opened_DT__c field with the current timestamp (from varNOW formula) to create an audit trail of when the opportunity was reopened from Closed status. This timestamp is valuable for reporting on opportunity lifecycle, tracking reopen frequency, and understanding case management patterns. After stamping the timestamp, proceeds to find and restore related Med Approvals that need reactivation.</description>
+        <name>Update_Opportunity_ReOpen_DT</name>
+        <label>Stamp Reopening Timestamp</label>
+        <locationX>50</locationX>
+        <locationY>455</locationY>
+        <connector>
+            <targetReference>Get_CMAs</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Case_Re_Opened_DT__c</field>
+            <value>
+                <elementReference>varNOW</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Only_Closed_Opportunities</targetReference>
+        </connector>
+        <filterLogic>1 AND (2 OR 3 OR 4 OR 5 OR 6 OR 8) AND 7</filterLogic>
+        <filters>
+            <field>StageName</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Open Case</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>VOB Submitted</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Assessment Complete</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Pending Schedule</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Scheduled for Admission</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>LastModifiedById</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>005610000037sM8</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>VOB Completed</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

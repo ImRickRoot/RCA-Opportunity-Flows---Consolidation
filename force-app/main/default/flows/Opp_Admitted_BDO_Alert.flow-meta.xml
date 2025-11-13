@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to bdo@recoverycoa.com when an opportunity's stage changes to 'Admitted' or 'Admitted to Outpatient' AND the BDO Region is not 'Non-BDO'. This alert informs the Business Development Organization (BDO) team that a patient they are tracking has been successfully admitted to treatment, allowing them to track admission outcomes and maintain relationships with referral sources.</description>
+        <name>Opp_Admitted_BDO_Alert</name>
+        <label>Opportunity Admitted BDO Alert Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>bdo@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Opportunity Admitted - {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>An opportunity has been admitted.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+BDO Region: {!$Record.BDO_Region__c}
+
+Please review and take appropriate action.</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>BUSINESS PROCESS: Sends automated email notification to the Business Development Organization (BDO) team when an opportunity is admitted to treatment (stage changes to 'Admitted' or 'Admitted to Outpatient'). Only triggers for opportunities with a BDO Region that is not 'Non-BDO', ensuring BDO team is informed of successful admissions for opportunities they are tracking. This helps BDO maintain relationships with referral sources and track admission conversion rates. Refactored from Case to Opportunity object.</description>
+    <interviewLabel>Opportunity Admitted BDO Alert {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity Admitted BDO Alert</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Opp_Admitted_BDO_Alert</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>1 AND (2 OR 3)</filterLogic>
+        <filters>
+            <field>BDO_Region__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Non-BDO</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted to Outpatient</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

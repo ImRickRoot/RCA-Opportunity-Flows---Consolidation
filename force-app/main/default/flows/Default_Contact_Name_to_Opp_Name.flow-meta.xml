@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>DATA QUALITY: Automatically sets a meaningful default name for opportunities that have blank or system-generated names. Triggers before save when the opportunity Name field is null or contains the text 'New Opportunity' (system default). Creates a standardized name format using the patient's first and last name from the related Account, plus the opportunity ID (e.g., 'John Smith - Opp 0061234567890'). This ensures all opportunities have human-readable, searchable names for reporting, list views, and user navigation. Critical for data quality and user experience. Refactored from Case object (Subject field) to Opportunity object (Name field).</description>
+    <label>Default Contact Name to Opportunity Name</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Sets the opportunity Name field to a standardized format combining the patient's full name (from related Account FirstName and LastName) with the Opportunity ID. Format: '[FirstName] [LastName] - Opp [OpportunityId]'. This replaces blank or system-generated opportunity names with meaningful, human-readable identifiers that improve data quality, searchability, and user experience. Formerly used the Case Subject field and Case Number; adapted to use Opportunity Name field.</description>
+        <name>mainUpdate</name>
+        <label>Set Default Opportunity Name</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <stringValue>{!$Record.Account.FirstName} {!$Record.Account.LastName} - Opp {!$Record.Id}</stringValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>mainUpdate</targetReference>
+        </connector>
+        <filterLogic>1 OR 2</filterLogic>
+        <filters>
+            <field>Name</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Name</field>
+            <operator>Contains</operator>
+            <value>
+                <stringValue>New Opportunity</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

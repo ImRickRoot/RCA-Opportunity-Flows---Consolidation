@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests CMA_Alert_on_Facility_Change_Opp when Facility__c changes with active med approvals - should send alert email.</description>
+    <flowApiName>CMA_Alert_on_Facility_Change_Opp</flowApiName>
+    <label>CMA Alert on Facility Change - Facility Changed</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Facility Change&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (IP)&quot;}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Facility Change&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Devon (IP)&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (IP)</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

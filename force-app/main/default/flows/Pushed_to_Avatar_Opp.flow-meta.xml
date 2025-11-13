@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>AUDIT TRAIL: Records the user who pushed/synced an opportunity record to the Avatar system (EHR integration). Triggers after save when Sync_to_Avatar__c changes to TRUE and the audit fields are still blank. Captures the user's full name and email address for audit trail and troubleshooting purposes. This provides accountability and visibility into who initiated the Avatar sync, which is critical for debugging integration issues and maintaining compliance with data transfer protocols. Refactored from Case to Opportunity object, migrated from legacy workflow rule.</description>
+    <formulas>
+        <description>Formula that concatenates the current user's first name and last name with a space separator to create a full name string. This full name is stamped into the Sent_to_Avatar_By__c field to record who initiated the Avatar sync. Returns a text string like 'John Smith'. Used in conjunction with the user's email to provide complete audit trail information for the integration event.</description>
+        <name>Sent_to_Avatar_By_UpdateFormula</name>
+        <dataType>String</dataType>
+        <expression>{!$User.FirstName} + &quot; &quot; + {!$User.LastName}</expression>
+    </formulas>
+    <label>Pushed to Avatar (Opp)</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the opportunity record with audit trail information when it is synced to Avatar. Stamps two fields: (1) Sent_to_Avatar_By__c - the user's full name using the formula, and (2) Sent_to_Avatar_by_Email__c - the user's email address. This audit information is captured only once (when these fields are null) to record who initiated the original sync. Critical for troubleshooting integration issues, compliance auditing, and understanding data flow to the Avatar EHR system.</description>
+        <name>mainUpdate</name>
+        <label>Record Avatar Sync User</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Sent_to_Avatar_By__c</field>
+            <value>
+                <elementReference>Sent_to_Avatar_By_UpdateFormula</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Sent_to_Avatar_by_Email__c</field>
+            <value>
+                <elementReference>$User.Email</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>mainUpdate</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Sync_to_Avatar__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Sent_to_Avatar_By__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

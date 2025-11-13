@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>AUDIT TRAIL: Preserves the prior value of Scheduled_Date_and_Time__c by storing it in Previous_Scheduled_Date_and_Time__c whenever the scheduled date/time changes. Triggers after save when Scheduled_Date_and_Time__c is modified. This historical tracking is used for email notifications (particularly reschedule alerts) and audit purposes, allowing staff to see both the old and new scheduled times. Critical for tracking appointment changes, coordinating facility schedules, and notifying relevant parties of reschedules. The previous value is available for comparison in email templates and workflows. Refactored from Case to Opportunity object, migrated from legacy workflow rule.</description>
+    <formulas>
+        <description>Formula that retrieves the previous value of Scheduled_Date_and_Time__c field using the PRIORVALUE() function. Captures what the scheduled date/time was before the current change, enabling historical tracking of appointment reschedules. This prior value is stored in Previous_Scheduled_Date_and_Time__c for use in email alerts and audit reports. Returns a DateTime value representing the scheduled date/time before the current update.</description>
+        <name>Previous_Scheuled_Date_and_TimeFormula</name>
+        <dataType>DateTime</dataType>
+        <expression>PRIORVALUE($Record.Scheduled_Date_and_Time__c)</expression>
+    </formulas>
+    <label>Update Previous Scheduled Date and Time (Opp)</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the opportunity record by storing the prior Scheduled_Date_and_Time__c value (captured via PRIORVALUE formula) into the Previous_Scheduled_Date_and_Time__c field. This creates a historical record of the previous appointment time whenever a reschedule occurs. Used extensively in email notifications to inform staff and patients of schedule changes (e.g., 'Your appointment was moved from [old time] to [new time]'). Critical for appointment coordination and change tracking.</description>
+        <name>mainUpdate</name>
+        <label>Store Previous Scheduled Date Time</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Previous_Scheduled_Date_and_Time__c</field>
+            <value>
+                <elementReference>Previous_Scheuled_Date_and_TimeFormula</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>mainUpdate</targetReference>
+        </connector>
+        <filterFormula>ISCHANGED( {!$Record.Scheduled_Date_and_Time__c} )</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

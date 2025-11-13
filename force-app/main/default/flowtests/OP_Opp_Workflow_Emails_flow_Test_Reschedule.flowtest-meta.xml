@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests OP_Opp_Workflow_Emails_flow when Scheduled_Date_and_Time__c changes for OP facility - should trigger reschedule notification.</description>
+    <flowApiName>OP_Opp_Workflow_Emails_flow</flowApiName>
+    <label>OP Opp Workflow Emails - Reschedule</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - OP Reschedule&quot;,&quot;StageName&quot;:&quot;Scheduled for Admission&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (OP)&quot;,&quot;Sync_to_Avatar__c&quot;:true,&quot;Scheduled_Date_and_Time__c&quot;:&quot;2025-11-20T10:00:00.000Z&quot;}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - OP Reschedule&quot;,&quot;StageName&quot;:&quot;Scheduled for Admission&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (OP)&quot;,&quot;Sync_to_Avatar__c&quot;:true,&quot;Scheduled_Date_and_Time__c&quot;:&quot;2025-11-22T14:00:00.000Z&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Scheduled for Admission</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

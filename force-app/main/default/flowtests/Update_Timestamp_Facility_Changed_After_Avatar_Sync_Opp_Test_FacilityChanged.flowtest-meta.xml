@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Update_Timestamp_Facility_Changed_After_Avatar_Sync_Opp when Facility__c changes after Avatar sync - should timestamp the change.</description>
+    <flowApiName>Update_Timestamp_Facility_Changed_After_Avatar_Sync_Opp</flowApiName>
+    <label>Update Timestamp Facility Changed After Avatar Sync - Facility Changed</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Facility Change After Sync&quot;,&quot;StageName&quot;:&quot;Scheduled for Admission&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Danvers (IP)&quot;,&quot;Sync_to_Avatar__c&quot;:true}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Facility Change After Sync&quot;,&quot;StageName&quot;:&quot;Scheduled for Admission&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Facility__c&quot;:&quot;Devon (IP)&quot;,&quot;Sync_to_Avatar__c&quot;:true}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

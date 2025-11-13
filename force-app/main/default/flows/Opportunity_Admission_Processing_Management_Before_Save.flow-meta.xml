@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <label>Opportunity_Admission_Processing_Management_Before_Save</label>
+    <interviewLabel>Opportunity_Admission_Processing_Management_Before_Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <description>This flow replaces Facility_Admission_Notes_Field_Update_Flow_Opp, Set_Admission_Type_Opp, and Calculate_Days_Since_Last_Prior_Discharge_Opp. We skip FinPay API edits, stamp the facility admission notes, classify the visit as first-time or readmission, and refresh the IP/OP day counters so Opportunity data stays current in a single before-save pass.</description>
+    <processType>AutoLaunchedFlow</processType>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <decisions>
+        <name>Check_FinPay_User</name>
+        <label>Check FinPay User</label>
+        <description>Confirm whether the FinPay API user initiated the edit so we can exit quietly when automation is not needed.</description>
+        <locationX>300</locationX>
+        <locationY>80</locationY>
+        <defaultConnector>
+            <targetReference>Route_Facility_Notes</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Continue</defaultConnectorLabel>
+        <rules>
+            <name>Skip_FinPay_API</name>
+            <label>Skip FinPay API</label>
+            <description>End the flow when the FinPay API user made the change so we do not overwrite their automated updates.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$User.Username</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>finpayapi@recoverycoa.com</stringValue>
+                </rightValue>
+            </conditions>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Route_Facility_Notes</name>
+        <label>Route Facility Notes</label>
+        <description>Select the matching facility so we assign the correct admission notes before save.</description>
+        <locationX>300</locationX>
+        <locationY>220</locationY>
+        <defaultConnector>
+            <targetReference>Clear_Facility_Notes</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Facility Not Matched</defaultConnectorLabel>
+        <rules>
+            <name>Bracebridge_IP</name>
+            <label>Bracebridge (IP)</label>
+            <description>Assign Bracebridge inpatient notes so the record reflects site-specific guidance.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Bracebridge_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Danvers_IP</name>
+            <label>Danvers (IP)</label>
+            <description>Assign Danvers inpatient notes so the clinical team reads the right intake information.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Danvers_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Devon_IP</name>
+            <label>Devon (IP)</label>
+            <description>Assign Devon inpatient notes so we share the correct onsite instructions.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Devon_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Indianapolis_IP</name>
+            <label>Indianapolis (IP)</label>
+            <description>Assign Indianapolis inpatient notes so the downstream team sees the right playbook.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Indy_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Lighthouse_IP</name>
+            <label>Lighthouse (IP)</label>
+            <description>Assign Lighthouse inpatient notes so clinicians see the correct intake reminders.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lighthouse (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Lighthouse_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>MCAT_IP</name>
+            <label>MCAT (IP)</label>
+            <description>Assign MCAT inpatient notes so shared guidance stays consistent.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_MCAT_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Monroeville_IP</name>
+            <label>Monroeville (IP)</label>
+            <description>Assign Monroeville inpatient notes so staff follow the correct protocols.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Monroeville_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Raritan_Bay_IP</name>
+            <label>Raritan Bay (IP)</label>
+            <description>Assign Raritan Bay inpatient notes so admissions teams stay aligned.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Raritan Bay (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Raritan_Bay_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>St_Charles_IP</name>
+            <label>St. Charles (IP)</label>
+            <description>Assign St. Charles inpatient notes so staff access the right playbook.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_St_Charles_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Westminster_IP</name>
+            <label>Westminster (IP)</label>
+            <description>Assign Westminster inpatient notes so the local team gets the expected guidance.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Westminster (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Westminster_Facility_Notes</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Should_Set_Admission_Type</name>
+        <label>Should Set Admission Type</label>
+        <description>Check whether the opportunity just transitioned into an admitted stage with a valid admission date.</description>
+        <locationX>300</locationX>
+        <locationY>620</locationY>
+        <defaultConnector>
+            <targetReference>Should_Calculate_Days</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Skip Admission Type</defaultConnectorLabel>
+        <rules>
+            <name>Evaluate_Admission_Type</name>
+            <label>Evaluate Admission Type</label>
+            <description>Run the admission type logic when the stage changed to an admitted value and the admission date is present.</description>
+            <conditionLogic>(1 OR 2) AND 3 AND 4</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted to Outpatient</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record__Prior.StageName</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Admission_Date__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Previous_Admission_Opp</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Determine_Admission_Type</name>
+        <label>Determine Admission Type</label>
+        <description>Interpret the prior admission details to decide whether this visit is first-time or a readmission.</description>
+        <locationX>300</locationX>
+        <locationY>960</locationY>
+        <defaultConnector>
+            <targetReference>Should_Calculate_Days</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>No Admission Match</defaultConnectorLabel>
+        <rules>
+            <name>First_Time_Admission</name>
+            <label>First Time Admission</label>
+            <description>Mark the record as first-time when the prior stay was long ago or not found so downstream reports stay accurate.</description>
+            <conditionLogic>(1 AND (2 OR 3)) OR ((2 OR 3) AND (4 OR 5)) OR 6</conditionLogic>
+            <conditions>
+                <leftValueReference>CalculateDays</leftValueReference>
+                <operator>GreaterThan</operator>
+                <rightValue>
+                    <numberValue>180.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted to Outpatient</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Transfer_from_LOC__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>IP to OP Step-down</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Transfer_from_LOC__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>OP to IP Step-up</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Name</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Set_First_Time_Admission</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Readmission_Path</name>
+            <label>Readmission</label>
+            <description>Mark the record as a readmission when the last stay was recent and discharged so teams can tailor care plans.</description>
+            <conditionLogic>1 AND (2 OR 3) AND 4</conditionLogic>
+            <conditions>
+                <leftValueReference>CalculateDays</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <numberValue>180.0</numberValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Admitted to Outpatient</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Previous_Admission_Opp.Discharge_Datecc__c</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Set_Readmission</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Should_Calculate_Days</name>
+        <label>Should Calculate Days</label>
+        <description>Check whether the admission date just changed so we only recalc the IP and OP day counters when needed.</description>
+        <locationX>300</locationX>
+        <locationY>1260</locationY>
+        <defaultConnectorLabel>Skip Day Calculation</defaultConnectorLabel>
+        <rules>
+            <name>Admission_Date_Changed</name>
+            <label>Admission Date Changed</label>
+            <description>Continue when the admission date is present and differs from the prior value.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Admission_Date__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record__Prior.Admission_Date__c</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Admission_Date__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Record_Type_Id</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Route_Days_Path</name>
+        <label>Route Days Path</label>
+        <description>Pick the inpatient or outpatient branch so we update the right day counter.</description>
+        <locationX>300</locationX>
+        <locationY>1580</locationY>
+        <defaultConnectorLabel>No Facility Match</defaultConnectorLabel>
+        <rules>
+            <name>IP_Path</name>
+            <label>IP Facility</label>
+            <description>Run the inpatient calculation when the facility name contains (IP) and matches the admissions record type.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>(IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Record_Type_Id.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_All_Opportunity_From_Account</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>OP_Path</name>
+            <label>OP Facility</label>
+            <description>Run the outpatient calculation when the facility name contains (OP) for the admissions record type.</description>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>Contains</operator>
+                <rightValue>
+                    <stringValue>(OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Record_Type_Id.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_All_Opportunity_From_Account_for_OP</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <recordLookups>
+        <name>Get_Previous_Admission_Opp</name>
+        <label>Get Previous Admission Opportunity</label>
+        <description>We retrieve the most recent admitted opportunity for this account so we can compare dates and transfer details.</description>
+        <locationX>300</locationX>
+        <locationY>820</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Determine_Admission_Type</targetReference>
+        </connector>
+        <filterLogic>1 AND 2 AND (3 OR 4)</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Id</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Admitted to Outpatient</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <sortField>Name</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Record_Type_Id</name>
+        <label>Get Admissions Record Type</label>
+        <description>We retrieve the admissions record type Id so the day counter logic only runs for the correct record type.</description>
+        <locationX>300</locationX>
+        <locationY>1420</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Route_Days_Path</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Case_2_0</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <sortField>Id</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_All_Opportunity_From_Account</name>
+        <label>Get Prior IP Opportunity</label>
+        <description>We retrieve the most recent inpatient discharge for this account so we can calculate days since discharge.</description>
+        <locationX>120</locationX>
+        <locationY>1740</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Update_IP_Days</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Discharge_Datecc__c</field>
+            <operator>LessThan</operator>
+            <value>
+                <elementReference>$Record.Admission_Date__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Discharge_Datecc__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Record_Type_Id.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Facility__c</field>
+            <operator>Contains</operator>
+            <value>
+                <stringValue>(IP)</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <sortField>Discharge_Datecc__c</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_All_Opportunity_From_Account_for_OP</name>
+        <label>Get Prior OP Opportunity</label>
+        <description>We retrieve the most recent outpatient discharge for this account so the OP day counter stays current.</description>
+        <locationX>480</locationX>
+        <locationY>1740</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Update_OP_Days</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>AccountId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Discharge_Datecc__c</field>
+            <operator>LessThan</operator>
+            <value>
+                <elementReference>$Record.Admission_Date__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Record_Type_Id.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Facility__c</field>
+            <operator>Contains</operator>
+            <value>
+                <stringValue>(OP)</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Discharge_Datecc__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <sortField>Discharge_Datecc__c</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Update_IP_Days</name>
+        <label>Update IP Days</label>
+        <description>We update the inpatient days counter so reporting reflects the time since the last IP discharge.</description>
+        <locationX>120</locationX>
+        <locationY>1880</locationY>
+        <inputAssignments>
+            <field>Days_since_last_IP_discharge__c</field>
+            <value>
+                <elementReference>TotalCountDifference</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_OP_Days</name>
+        <label>Update OP Days</label>
+        <description>We update the outpatient days counter so OP teams know the time since the prior discharge.</description>
+        <locationX>480</locationX>
+        <locationY>1880</locationY>
+        <inputAssignments>
+            <field>Days_since_last_OP_discharge__c</field>
+            <value>
+                <elementReference>TotalCountDifferenceOP</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <assignments>
+        <name>Assign_Bracebridge_Facility_Notes</name>
+        <label>Assign Bracebridge Facility Notes</label>
+        <description>Set the facility notes to the Bracebridge template so staff see the latest guidance.</description>
+        <locationX>120</locationX>
+        <locationY>360</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Bracebridge_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Danvers_Facility_Notes</name>
+        <label>Assign Danvers Facility Notes</label>
+        <description>Set the facility notes to the Danvers template so coordinators receive site-specific updates.</description>
+        <locationX>180</locationX>
+        <locationY>440</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Danvers_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Devon_Facility_Notes</name>
+        <label>Assign Devon Facility Notes</label>
+        <description>Set the facility notes to the Devon template so staff see the correct procedures.</description>
+        <locationX>240</locationX>
+        <locationY>520</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Devon_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Indy_Facility_Notes</name>
+        <label>Assign Indy Facility Notes</label>
+        <description>Set the facility notes to the Indianapolis template so teams stay aligned on intake expectations.</description>
+        <locationX>300</locationX>
+        <locationY>520</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Indy_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Lighthouse_Facility_Notes</name>
+        <label>Assign Lighthouse Facility Notes</label>
+        <description>Set the facility notes to the Lighthouse template so the local team receives consistent guidance.</description>
+        <locationX>360</locationX>
+        <locationY>440</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Lighthouse_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_MCAT_Facility_Notes</name>
+        <label>Assign MCAT Facility Notes</label>
+        <description>Set the facility notes to the MCAT template so stakeholders see accurate site instructions.</description>
+        <locationX>420</locationX>
+        <locationY>360</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>MCAT_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Monroeville_Facility_Notes</name>
+        <label>Assign Monroeville Facility Notes</label>
+        <description>Set the facility notes to the Monroeville template so intake teams can act fast.</description>
+        <locationX>60</locationX>
+        <locationY>520</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Monroeville_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Raritan_Bay_Facility_Notes</name>
+        <label>Assign Raritan Bay Facility Notes</label>
+        <description>Set the facility notes to the Raritan Bay template so staff stay aligned.</description>
+        <locationX>0</locationX>
+        <locationY>440</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>RaritanBay_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_St_Charles_Facility_Notes</name>
+        <label>Assign St. Charles Facility Notes</label>
+        <description>Set the facility notes to the St. Charles template so the team sees the right updates.</description>
+        <locationX>480</locationX>
+        <locationY>440</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>StCharles_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Assign_Westminster_Facility_Notes</name>
+        <label>Assign Westminster Facility Notes</label>
+        <description>Set the facility notes to the Westminster template so the receiving staff stay informed.</description>
+        <locationX>540</locationX>
+        <locationY>360</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Westminster_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Clear_Facility_Notes</name>
+        <label>Clear Facility Notes</label>
+        <description>Clear the facility notes when the site is OP or MAT so we avoid showing IP-only instructions.</description>
+        <locationX>300</locationX>
+        <locationY>520</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue> </stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Set_Admission_Type</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_First_Time_Admission</name>
+        <label>Set First Time Admission</label>
+        <description>Mark the admission as first-time so the opportunity reflects the correct status.</description>
+        <locationX>180</locationX>
+        <locationY>1080</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Admission_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>First Time Admission</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Calculate_Days</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Set_Readmission</name>
+        <label>Set Readmission</label>
+        <description>Mark the admission as a readmission so downstream automation avoids duplicates.</description>
+        <locationX>420</locationX>
+        <locationY>1080</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Admission_Type__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Readmission</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Should_Calculate_Days</targetReference>
+        </connector>
+    </assignments>
+    <formulas>
+        <name>CalculateDays</name>
+        <dataType>Number</dataType>
+        <expression>{!$Record.Admission_Date__c} - {!Get_Previous_Admission_Opp.Discharge_Datecc__c}</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <name>TotalCountDifference</name>
+        <dataType>Number</dataType>
+        <expression>({!$Record.Admission_Date__c} - {!Get_All_Opportunity_From_Account.Discharge_Datecc__c})</expression>
+        <scale>0</scale>
+    </formulas>
+    <formulas>
+        <name>TotalCountDifferenceOP</name>
+        <dataType>Number</dataType>
+        <expression>({!$Record.Admission_Date__c} - {!Get_All_Opportunity_From_Account_for_OP.Discharge_Datecc__c})</expression>
+        <scale>0</scale>
+    </formulas>
+    <textTemplates>
+        <name>Bracebridge_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Danvers_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Devon_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Indy_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Lighthouse_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>MCAT_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Monroeville_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>RaritanBay_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>StCharles_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Westminster_FacilityAdmitNotes</name>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <start>
+        <locationX>300</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Check_FinPay_User</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
+
+

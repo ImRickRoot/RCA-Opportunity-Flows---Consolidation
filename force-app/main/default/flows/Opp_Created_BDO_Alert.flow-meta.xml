@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to bdo@recoverycoa.com when a new opportunity is created AND the BDO Region is not 'Non-BDO'. This alert informs the Business Development Organization (BDO) team that a new patient inquiry or referral has been received in their region, allowing them to track new leads, monitor referral source activity, and follow up as needed to support the admissions process.</description>
+        <name>Opp_Created_BDO_Alert</name>
+        <label>Opportunity Created BDO Alert Email</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>bdo@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Opportunity Created - {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new opportunity has been created.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+BDO Region: {!$Record.BDO_Region__c}
+
+Please review and take appropriate action.</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>BUSINESS PROCESS: Sends automated email notification to the Business Development Organization (BDO) team when a new opportunity is created in the system. Only triggers for opportunities with a BDO Region that is not 'Non-BDO', ensuring BDO team is informed of new patient inquiries and referrals in their assigned regions. This helps BDO maintain visibility of the lead pipeline, track referral source activity, and support the admissions process from initial inquiry through admission. Refactored from Case to Opportunity object.</description>
+    <interviewLabel>Opportunity Created BDO Alert {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity Created BDO Alert</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Opp_Created_BDO_Alert</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>BDO_Region__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Non-BDO</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Copy_Opp_LeadSource_from_Account_Source when LeadSource already exists - flow should not trigger.</description>
+    <flowApiName>Copy_Opp_LeadSource_from_Account_Source</flowApiName>
+    <label>Copy Opp LeadSource - LeadSource Exists (No Trigger)</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - LeadSource Exists&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;LeadSource&quot;:&quot;Web&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.LeadSource</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Web</stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

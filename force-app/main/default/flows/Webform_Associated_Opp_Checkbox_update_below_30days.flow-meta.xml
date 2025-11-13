@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Sets the Webform_Associated_Opportunity__c checkbox to TRUE when the patient submitted a webform (MC form) within the last 30 days. This flag indicates the opportunity is associated with a recent webform submission, which is used for reporting, workflow routing, and understanding patient acquisition channels. Helps identify opportunities that originated from online inquiries vs other sources.</description>
+        <name>Update_Webform_Associated_Opp_Checkbox</name>
+        <label>Flag as Webform-Associated Opportunity</label>
+        <locationX>50</locationX>
+        <locationY>503</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Webform_Associated_Opportunity__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Evaluates whether the webform submission occurred within the last 30 days using the Webform_Caliculation formula. Also checks that: (1) RecordType is 'Case 2.0', and (2) Last_MC_Form_Submit_Date_Time__pc is not null. If all conditions are TRUE, proceeds to flag the opportunity as webform-associated. If any condition is FALSE, the flow ends without flagging. This ensures only recent, valid webform-driven opportunities are flagged.</description>
+        <name>Last_MC_form_submitted_Date_Check</name>
+        <label>Is Webform Submission Within 30 Days?</label>
+        <locationX>182</locationX>
+        <locationY>395</locationY>
+        <defaultConnectorLabel>No - End Without Flagging</defaultConnectorLabel>
+        <rules>
+            <name>Below_30days</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Webform_Caliculation</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.RecordType.Name</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Case 2.0</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>get_Account_Records.Last_MC_Form_Submit_Date_Time__pc</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_Webform_Associated_Opp_Checkbox</targetReference>
+            </connector>
+            <label>Yes - Within 30 Days</label>
+        </rules>
+    </decisions>
+    <description>DATA QUALITY: Automatically flags opportunities as webform-associated when created within 30 days of the patient's webform (MC form) submission. Triggers before save on opportunity creation. Queries the Account to check Last_MC_Form_Submit_Date_Time__pc, calculates if submission was within 30 days, and sets Webform_Associated_Opportunity__c checkbox to TRUE if criteria are met. This tracking enables reporting on webform conversion rates, digital marketing effectiveness, and patient acquisition channel analysis. Critical for understanding which opportunities originated from online inquiries. Refactored from Case to Opportunity object, converted to Before Save flow with assignment instead of update.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula that calculates whether the patient's webform (MC form) submission occurred within the last 30 days. Compares TODAY() to the DATEVALUE of Last_MC_Form_Submit_Date_Time__pc from the Account. Returns TRUE if the submission was ≤30 days ago, FALSE otherwise. This 30-day window defines the timeframe for associating opportunities with webform submissions, balancing recency with reasonable opportunity creation timelines. Used in the decision element to determine if the opportunity should be flagged.</description>
+        <name>Webform_Caliculation</name>
+        <dataType>Boolean</dataType>
+        <expression>IF(
+    TODAY() - DATEVALUE({!get_Account_Records.Last_MC_Form_Submit_Date_Time__pc}) &lt;= 30,
+    TRUE,
+    FALSE
+)</expression>
+    </formulas>
+    <interviewLabel>Webform Associated Opp Checkbox update below 30days {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Webform Associated Opp Checkbox update below 30days</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries the Account object to retrieve the patient's webform submission timestamp. Looks up the Account record using the opportunity's AccountId and automatically stores all fields, importantly including Last_MC_Form_Submit_Date_Time__pc. This timestamp is then used by the Webform_Caliculation formula to determine if the webform was submitted within 30 days of the opportunity creation. Essential for accessing Account-level webform data to make the webform association decision.</description>
+        <name>get_Account_Records</name>
+        <label>Get Patient Account with Webform Data</label>
+        <locationX>182</locationX>
+        <locationY>287</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Last_MC_form_submitted_Date_Check</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.AccountId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Account</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>get_Account_Records</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

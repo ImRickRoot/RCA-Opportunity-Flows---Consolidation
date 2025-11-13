@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>56.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates whether the Account's AccountSource field is blank (using the AccountSource formula). If the Account Source is blank (TRUE), proceeds to copy it to the Opportunity's LeadSource field. If Account Source has a value (FALSE), the flow ends without action. This decision prevents overwriting existing Account Source values and only performs the copy when the field is empty.</description>
+        <name>Update_Opp_LeadSource</name>
+        <label>Is Account Source Blank?</label>
+        <locationX>788</locationX>
+        <locationY>423</locationY>
+        <defaultConnectorLabel>Account Source Has Value - No Update</defaultConnectorLabel>
+        <rules>
+            <name>Update_LeadSource</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>AccountSource</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>update_Opp_LeadSource_field</targetReference>
+            </connector>
+            <label>Yes - Copy to LeadSource</label>
+        </rules>
+    </decisions>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula that checks if the Account's AccountSource field is blank/empty using ISPICKVAL with an empty string. Returns TRUE if Account Source is blank, FALSE if it contains a value. This boolean result is used in the decision element to determine whether the Account Source should be copied to the Opportunity's LeadSource field. The copy only occurs when this formula returns TRUE (blank Account Source).</description>
+        <name>AccountSource</name>
+        <dataType>Boolean</dataType>
+        <expression>ISPICKVAL({!$Record.Account.AccountSource},&quot;&quot;)</expression>
+    </formulas>
+    <description>DATA QUALITY: Copies the Account's AccountSource field to the Opportunity's LeadSource field when a new opportunity is created. Triggers after save on opportunity creation for specific record type (01261000000SRCdAAO) when Account is populated. Only performs the copy if Account Source is blank, preserving the original source tracking when a value exists. This ensures lead source consistency between Account and Opportunity records for reporting and analytics. Helps maintain accurate lead source attribution across the patient journey from initial contact (Account) to treatment opportunities.</description>
+    <interviewLabel>Copy Opp LeadSource from Account Source {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Copy Opp LeadSource from Account Source</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the opportunity's LeadSource field by copying the value from the related Account's AccountSource field. This synchronization ensures lead source tracking is consistent between the Account (patient) and Opportunity (treatment episode) records. Only executes when Account Source is blank, preventing overwriting of existing source data. Critical for marketing attribution, referral source tracking, and understanding how patients initially found the organization.</description>
+        <name>update_Opp_LeadSource_field</name>
+        <label>Copy Account Source to Opp LeadSource</label>
+        <locationX>1034</locationX>
+        <locationY>449</locationY>
+        <inputAssignments>
+            <field>LeadSource</field>
+            <value>
+                <elementReference>$Record.Account.AccountSource</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Update_Opp_LeadSource</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>01261000000SRCdAAO</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>AccountId</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

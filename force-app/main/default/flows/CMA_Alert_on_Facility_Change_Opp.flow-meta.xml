@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to medapprovals@example.com when a facility change occurs on an opportunity that has an active Med Approval. The email includes the opportunity name, old facility value, and new facility value to alert the CMA team that they need to review and potentially update the associated Med Approval record. This notification is critical because facility changes may impact approval validity, require re-approval, or necessitate coordination with the new facility's medical team.</description>
+        <name>SEND</name>
+        <label>Send CMA Facility Change Alert</label>
+        <locationX>908</locationX>
+        <locationY>1295</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>The Facility for Opportunity {!$Record.Name} has been changed from {!$Record__Prior.Facility__c} to {!$Record.Facility__c}. Please review the associated Med Approval record.</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>CMA Alert: Facility Change on Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>medapprovals@example.com</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>58.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Evaluates the current Approval Status to determine if an email alert should be sent to the CMA team. Currently, this decision is configured to always proceed to Update CMA regardless of status (the 'CURRENTLY NO FILTER' branch also updates). In the past, this may have filtered out Approved or Denied statuses to prevent unnecessary alerts, but the current configuration treats all statuses equally. Proceeds to update the CMA record with the Original_Facility__c value and sends the alert email.</description>
+        <name>Approval_Status_Filters</name>
+        <label>Check Approval Status (Currently No Filter)</label>
+        <locationX>776</locationX>
+        <locationY>1079</locationY>
+        <defaultConnector>
+            <targetReference>Update_CMA</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Send Email</defaultConnectorLabel>
+        <rules>
+            <name>Don_t_Send_Email</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>varApprovalStatus</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Approved</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>varApprovalStatus</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Denied</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_CMA</targetReference>
+            </connector>
+            <label>CURRENTLY NO FILTER - Always Update</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks if a Med Approval record (CMA) exists for this opportunity. If the Existing_CMA lookup returned a record (not null), proceeds to check the approval status. If no CMA exists (null), the flow ends because there's no Med Approval to alert about or update. This decision ensures the flow only processes opportunities that have active Med Approvals, preventing unnecessary processing and errors.</description>
+        <name>CMA_for_This_Opp</name>
+        <label>Does CMA Exist for This Opportunity?</label>
+        <locationX>776</locationX>
+        <locationY>779</locationY>
+        <defaultConnector>
+            <targetReference>Approval_Status_Filters</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default - Proceed to Status Check</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Existing_CMA</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Approval_Status_Filters</targetReference>
+            </connector>
+            <label>Yes - CMA Exists</label>
+        </rules>
+        <rules>
+            <name>No</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Existing_CMA</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>No - CMA Doesn't Exist, End Flow</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Determines if the facility change is a Level of Care (LOC) change within the same physical site, or a Physical Site change to a completely different location. LOC changes (e.g., IP to OP at same facility) may not require CMA notification. Physical Site changes (different Facility_Site__c values) always require notification. Uses the NewPhysicalSite formula to extract the site name from the new facility. If LOC change only, flow ends without notification. If Physical Site change, proceeds to check for existing CMA.</description>
+        <name>Facility_LOC_or_Site_Change</name>
+        <label>Facility: LOC or Site Change?</label>
+        <locationX>776</locationX>
+        <locationY>371</locationY>
+        <defaultConnector>
+            <targetReference>Existing_CMA</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Proceed to CMA Lookup</defaultConnectorLabel>
+        <rules>
+            <name>LOC</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record__Prior.Facility_Site__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>NewPhysicalSite</elementReference>
+                </rightValue>
+            </conditions>
+            <label>LOC Change Only - End Flow</label>
+        </rules>
+        <rules>
+            <name>Physical_Site</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record__Prior.Facility_Site__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Record.Facility_Site__c</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Existing_CMA</targetReference>
+            </connector>
+            <label>Physical Site Change - Notify CMA</label>
+        </rules>
+    </decisions>
+    <description>BUSINESS PROCESS: Alerts the Case Med Approval (CMA) team when the Facility field changes on an opportunity that has an active Med Approval. Distinguishes between Level of Care (LOC) changes within the same site vs Physical Site changes. Only sends alerts for physical site changes that impact Med Approval validity. Updates the Med Approval's Original_Facility__c field to preserve the pre-change facility value, then sends email notification to medapprovals@example.com. Triggers when Facility__c changes AND the opportunity has a Med Approval Status or PS Med Approval Status that is not 'Not Submitted for Approval'. Critical for ensuring Med Approval team maintains awareness of facility transfers that may require re-approval or coordination. Refactored from Case to Opportunity object.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula that extracts the physical site name from the new Facility__c value by parsing the text before the opening parenthesis. For example, if Facility__c = 'Bracebridge (IP)', this formula returns 'Bracebridge'. Uses LEFT and FIND functions to extract the site name, subtracting 2 to remove the space and parenthesis. This extracted site name is compared to the prior Facility_Site__c to determine if this is a Level of Care change (same site) or Physical Site change (different site). Returns text string of the site name.</description>
+        <name>NewPhysicalSite</name>
+        <dataType>String</dataType>
+        <expression>LEFT(TEXT({!$Record.Facility__c}), FIND(&quot;(&quot;, TEXT({!$Record.Facility__c})) - 2)</expression>
+    </formulas>
+    <interviewLabel>CMA Alert on Facility Change (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>CMA Alert on Facility Change (Opp)</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries the Case_Med_Approval__c object to find an existing Med Approval record for this opportunity. Searches for records where Opportunity__c matches the current opportunity's ID. Returns the most recent CMA (sorted by CreatedDate descending). Stores the Approval_Status__c in the varApprovalStatus variable and the record Id in the varCMA variable for use in subsequent decisions and updates. If no CMA is found, assigns null and the flow will end. This lookup is essential to determine if a Med Approval exists that needs to be notified about the facility change.</description>
+        <name>Existing_CMA</name>
+        <label>Find Existing Med Approval</label>
+        <locationX>776</locationX>
+        <locationY>671</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>CMA_for_This_Opp</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Opportunity__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <object>Case_Med_Approval__c</object>
+        <outputAssignments>
+            <assignToReference>varApprovalStatus</assignToReference>
+            <field>Approval_Status__c</field>
+        </outputAssignments>
+        <outputAssignments>
+            <assignToReference>varCMA.Id</assignToReference>
+            <field>Id</field>
+        </outputAssignments>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+    </recordLookups>
+    <recordUpdates>
+        <description>Updates the Med Approval record by setting the Original_Facility__c field to the prior facility value (before the change). This preserves a historical record of what facility the approval was originally obtained for, which is important for compliance auditing and understanding the approval history. After updating, proceeds to send the email alert to the CMA team. This update ensures the Med Approval maintains a complete record of facility changes.</description>
+        <name>Update_CMA</name>
+        <label>Store Original Facility on CMA</label>
+        <locationX>908</locationX>
+        <locationY>1187</locationY>
+        <connector>
+            <targetReference>SEND</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varCMA.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Original_Facility__c</field>
+            <value>
+                <elementReference>$Record__Prior.Facility__c</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Case_Med_Approval__c</object>
+    </recordUpdates>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Facility_LOC_or_Site_Change</targetReference>
+        </connector>
+        <filterLogic>(1 AND 2) AND ((3 AND 4) OR (5 AND 6))</filterLogic>
+        <filters>
+            <field>Facility__c</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>01261000000X5QbAAK</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Med_Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Not Submitted for Approval</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Med_Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>PS_Med_Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Not Submitted for Approval</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>PS_Med_Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Variable that stores the Approval_Status__c value from the Med Approval record found by the Existing_CMA lookup. Used in the Approval_Status_Filters decision to determine if special handling is needed based on status (though currently all statuses are treated equally). Type: Text. Collection: No. Input/Output: Both.</description>
+        <name>varApprovalStatus</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Variable that stores the Case_Med_Approval__c SObject record retrieved by the Existing_CMA lookup. Specifically stores the Id field, which is used in the Update_CMA record update to identify which Med Approval record to update with the Original_Facility__c value. Type: SObject (Case_Med_Approval__c). Collection: No. Input/Output: Both.</description>
+        <name>varCMA</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Case_Med_Approval__c</objectType>
+    </variables>
+</Flow>

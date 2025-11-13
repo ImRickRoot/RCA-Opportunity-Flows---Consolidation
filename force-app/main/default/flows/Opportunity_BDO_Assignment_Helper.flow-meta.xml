@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <label>Opportunity_BDO_Assignment_Helper</label>
+    <interviewLabel>Opportunity_BDO_Assignment_Helper {!$Flow.CurrentDateTime}</interviewLabel>
+    <description>This helper flow updates BDO ownership when an Opportunity is created or the Referent changes. We evaluate the incoming flags, update the BDO owner from the Referent, and exit without DML if nothing changed.</description>
+    <processType>AutoLaunchedFlow</processType>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <variables>
+        <name>recordId</name>
+        <description>The Opportunity Id passed from the parent flow.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>referentId</name>
+        <description>The Referent Id currently on the Opportunity.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>isNewOpportunity</name>
+        <description>Flag indicating the Opportunity is being created in this transaction.</description>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>referentChanged</name>
+        <description>Flag indicating the Referent lookup changed on this save.</description>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>referentOwnerId</name>
+        <description>The owner Id of the Referent account associated to the Opportunity.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <decisions>
+        <name>Should_Update_BDO</name>
+        <label>Should Update BDO</label>
+        <description>Determine whether we need to stamp the BDO owner for this Opportunity.</description>
+        <locationX>200</locationX>
+        <locationY>120</locationY>
+        <defaultConnectorLabel>No BDO Update Needed</defaultConnectorLabel>
+        <rules>
+            <name>On_Create</name>
+            <label>Set BDO on Create</label>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>isNewOpportunity</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>referentId</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_BDO_On_Create</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>On_Referent_Change</name>
+            <label>Set BDO on Referent Change</label>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>referentChanged</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>referentId</leftValueReference>
+                <operator>IsBlank</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Update_BDO_On_Change</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <recordUpdates>
+        <name>Update_BDO_On_Create</name>
+        <label>Update BDO on Create</label>
+        <description>Populate the BDO owner from the Referent on newly created opportunities.</description>
+        <locationX>200</locationX>
+        <locationY>220</locationY>
+        <connector>
+            <targetReference>Should_Update_BDO</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>BDO_Case_Owner__c</field>
+            <value>
+                <elementReference>referentOwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+    </recordUpdates>
+    <recordUpdates>
+        <name>Update_BDO_On_Change</name>
+        <label>Update BDO on Change</label>
+        <description>Refresh the BDO owner when the Referent lookup changes.</description>
+        <locationX>360</locationX>
+        <locationY>220</locationY>
+        <connector>
+            <targetReference>Should_Update_BDO</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>BDO_Case_Owner__c</field>
+            <value>
+                <elementReference>referentOwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Opportunity</object>
+    </recordUpdates>
+    <start>
+        <locationX>200</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Should_Update_BDO</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+</Flow>
+
+
+
+
+
+

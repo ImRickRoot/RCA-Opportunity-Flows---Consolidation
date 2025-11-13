@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>56.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Determines the appropriate action based on whether this is a new opportunity creation or an update to an existing opportunity's Referent field. Uses two formula fields (isnew and ischanged) to evaluate the context. If this is a new opportunity with a populated Referent, routes to the 'Populate_BDO' update. If the Referent field has changed on an existing opportunity, routes to the 'populate_BDO_change' update. This decision ensures the BDO owner is populated correctly in both creation and update scenarios.</description>
+        <name>Referent_Account_Check</name>
+        <label>Referent Account Check</label>
+        <locationX>768</locationX>
+        <locationY>414</locationY>
+        <defaultConnectorLabel>No Action Needed</defaultConnectorLabel>
+        <rules>
+            <name>Is_New</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>isnew</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Populate_BDO</targetReference>
+            </connector>
+            <label>Is New Opportunity</label>
+        </rules>
+        <rules>
+            <name>is_changed</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>ischanged</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>populate_BDO_change</targetReference>
+            </connector>
+            <label>Referent Changed</label>
+        </rules>
+    </decisions>
+    <description>BUSINESS PROCESS: Automatically populates the BDO_Case_Owner__c field by copying the Owner of the Referent Account to the opportunity. Triggers after save when an opportunity is created with a Referent or when the Referent field changes on an existing opportunity. This automation ensures that the appropriate Business Development Organization (BDO) representative is assigned to track the opportunity, maintaining the relationship between referral sources and the BDO team responsible for that account. Critical for BDO pipeline visibility and relationship management. Refactored from Case to Opportunity object.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula that evaluates whether the Referent__c field has been changed on an existing opportunity record. Uses the ISCHANGED() function to detect if the Referent field value was modified during this update transaction. Returns TRUE if the Referent has been changed, FALSE otherwise. Used in the decision element to determine if the BDO owner should be updated to match the new Referent's owner.</description>
+        <name>ischanged</name>
+        <dataType>Boolean</dataType>
+        <expression>ISCHANGED({!$Record.Referent__c})</expression>
+    </formulas>
+    <formulas>
+        <description>Formula that evaluates whether this is a newly created opportunity record with a populated Referent field. Combines ISNEW() to check if this is a new record creation AND NOT(ISBLANK()) to verify the Referent__c field is not blank. Returns TRUE only for new opportunities that have a Referent populated at creation time, ensuring the BDO owner is populated during the initial save. Used in the decision element to route new record creation scenarios.</description>
+        <name>isnew</name>
+        <dataType>Boolean</dataType>
+        <expression>ISNEW() &amp;&amp; NOT(ISBLANK({!$Record.Referent__c}))</expression>
+    </formulas>
+    <interviewLabel>Add BDO to Opportunity {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Add BDO to Opportunity</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the BDO_Case_Owner__c field on the newly created opportunity by copying the OwnerId from the related Referent Account. This action executes when a new opportunity is created with a Referent already populated. By automating this assignment, the flow ensures that the BDO representative who owns the referral source account is automatically linked to track this opportunity from creation, maintaining continuity in the referral relationship.</description>
+        <name>Populate_BDO</name>
+        <label>Populate BDO on New Opportunity</label>
+        <locationX>628</locationX>
+        <locationY>585</locationY>
+        <inputAssignments>
+            <field>BDO_Case_Owner__c</field>
+            <value>
+                <elementReference>$Record.Referent__r.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <recordUpdates>
+        <description>Updates the BDO_Case_Owner__c field on an existing opportunity when the Referent__c field has been changed. Copies the new Referent Account's OwnerId to ensure the BDO owner stays synchronized with the current referral source. This handles scenarios where the referral source is corrected or updated after initial opportunity creation, ensuring the correct BDO representative maintains visibility and tracking responsibility for the opportunity.</description>
+        <name>populate_BDO_change</name>
+        <label>Update BDO on Referent Change</label>
+        <locationX>958</locationX>
+        <locationY>614</locationY>
+        <inputAssignments>
+            <field>BDO_Case_Owner__c</field>
+            <value>
+                <elementReference>$Record.Referent__r.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>650</locationX>
+        <locationY>48</locationY>
+        <connector>
+            <targetReference>Referent_Account_Check</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Referent__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

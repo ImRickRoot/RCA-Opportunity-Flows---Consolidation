@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <label>Opportunity_Med_Approvals_Close_Helper</label>
+    <interviewLabel>Opportunity_Med_Approvals_Close_Helper {!$Flow.CurrentDateTime}</interviewLabel>
+    <description>This helper flow closes related medical approvals for an opportunity. We load the records by Id, store the pre-closure status values, and update each approval to reflect the opportunity closure.</description>
+    <processType>AutoLaunchedFlow</processType>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <variables>
+        <name>recordId</name>
+        <description>The Id of the opportunity whose medical approvals we need to close.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>ApprovalStatusPreClosure</name>
+        <description>Stores the approval status before we overwrite it.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>ReviewStatusPreClosure</name>
+        <description>Stores the review type before we overwrite it.</description>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>OppMedApprovals</name>
+        <description>Holds the related medical approvals for processing.</description>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Case_Med_Approval__c</objectType>
+    </variables>
+    <recordLookups>
+        <name>Get_Opportunity</name>
+        <label>Get Opportunity</label>
+        <description>We load the opportunity to confirm it is the admissions record type and currently closed.</description>
+        <locationX>200</locationX>
+        <locationY>80</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Should_Close_Med_Approvals</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <queriedFields>StageName</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Related_Med_Approvals</name>
+        <label>Get Related Med Approvals</label>
+        <description>We gather the open medical approvals so they can be closed when the opportunity closes.</description>
+        <locationX>200</locationX>
+        <locationY>200</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Loop_Med_Approvals</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Opportunity__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <object>Case_Med_Approval__c</object>
+        <outputReference>OppMedApprovals</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Approval_Status__c</queriedFields>
+        <queriedFields>Review_Type__c</queriedFields>
+    </recordLookups>
+    <decisions>
+        <name>Should_Close_Med_Approvals</name>
+        <label>Should Close Med Approvals</label>
+        <description>Run the helper only when the opportunity moved to Closed for the admissions record type.</description>
+        <locationX>200</locationX>
+        <locationY>120</locationY>
+        <defaultConnectorLabel>Skip Closing</defaultConnectorLabel>
+        <rules>
+            <name>Close_Med_Approvals</name>
+            <label>Close Med Approvals</label>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Opportunity.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Closed</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Get_Opportunity.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>01261000000X5QbAAK</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Related_Med_Approvals</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <loops>
+        <name>Loop_Med_Approvals</name>
+        <label>Loop Med Approvals</label>
+        <locationX>200</locationX>
+        <locationY>320</locationY>
+        <collectionReference>OppMedApprovals</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Set_Med_Previous_Status</targetReference>
+        </nextValueConnector>
+    </loops>
+    <assignments>
+        <name>Set_Med_Previous_Status</name>
+        <label>Set Med Previous Status</label>
+        <description>Store the current approval status and review type so we can write them to the pre-closure fields.</description>
+        <locationX>320</locationX>
+        <locationY>400</locationY>
+        <assignmentItems>
+            <assignToReference>ApprovalStatusPreClosure</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Med_Approvals.Approval_Status__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>ReviewStatusPreClosure</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Loop_Med_Approvals.Review_Type__c</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Close_Med_Approval</targetReference>
+        </connector>
+    </assignments>
+    <recordUpdates>
+        <name>Close_Med_Approval</name>
+        <label>Close Med Approval</label>
+        <description>We close the medical approval and capture the prior status for audit purposes.</description>
+        <locationX>320</locationX>
+        <locationY>480</locationY>
+        <connector>
+            <targetReference>Loop_Med_Approvals</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Loop_Med_Approvals.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Denied</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Closed via Opportunity</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Approval_Status__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Approved</stringValue>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Approval_Status_Pre_Closure__c</field>
+            <value>
+                <elementReference>ApprovalStatusPreClosure</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Approval_Status__c</field>
+            <value>
+                <stringValue>Closed via Opportunity</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Review_Type_Pre_Closure__c</field>
+            <value>
+                <elementReference>ReviewStatusPreClosure</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Review_Type__c</field>
+            <value>
+                <stringValue>Closed via Opportunity</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Case_Med_Approval__c</object>
+    </recordUpdates>
+    <start>
+        <locationX>200</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Opportunity</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+</Flow>

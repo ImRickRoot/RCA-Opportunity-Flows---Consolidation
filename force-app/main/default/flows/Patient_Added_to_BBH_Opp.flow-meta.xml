@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to bracebridge@recoverycoa.com (Bracebridge Hall - BBH team) when a patient is transferred from Lighthouse (LH) to BBH and added to the Avatar EHR system. The email includes opportunity details, facility information, patient name, and opportunity ID so the BBH team can locate and review the patient's record in Avatar. This notification ensures the receiving facility is immediately aware of the transfer and can prepare for the patient's arrival or continuation of care.</description>
+        <name>Patient_added_to_BBH_Avatar</name>
+        <label>Notify BBH of LH Patient Transfer</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>bracebridge@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Patient Added to BBH Avatar - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A patient has been transferred from LH to BBH and added to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+    </actionCalls>
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>BUSINESS PROCESS: Sends email notification to Bracebridge Hall (BBH) team when a patient is transferred from Lighthouse (LH) facility to BBH. Triggers after save when Transfer_from_LH_to_BBH__c checkbox changes to TRUE. Notifies bracebridge@recoverycoa.com that the patient has been added to the BBH Avatar system, providing opportunity and patient details for immediate record access. This inter-facility transfer notification ensures seamless care coordination and allows BBH to prepare for the patient's transition. Critical for maintaining continuity of care during facility transfers. Refactored from Case to Opportunity object, migrated from legacy workflow rule.</description>
+    <label>Patient Added to BBH (Opp)</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Patient_added_to_BBH_Avatar</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Transfer_from_LH_to_BBH__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

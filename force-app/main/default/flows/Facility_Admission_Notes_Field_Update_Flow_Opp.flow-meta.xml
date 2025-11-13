@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>49.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>populate Bracebridge Facility notes for BBH cases</description>
+        <name>Assign_Bracebridge_Facility_Notes</name>
+        <label>Assign Bracebridge Facility Notes</label>
+        <locationX>162</locationX>
+        <locationY>293</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Bracebridge_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Danvers_Facility_Notes</name>
+        <label>Assign Danvers Facility Notes</label>
+        <locationX>253</locationX>
+        <locationY>409</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Danvers_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Devon_Facility_Notes</name>
+        <label>Assign Devon Facility Notes</label>
+        <locationX>325</locationX>
+        <locationY>575</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Devon_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Indy_Facility_Notes</name>
+        <label>Assign Indy Facility Notes</label>
+        <locationX>404</locationX>
+        <locationY>699</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Indy_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Lighthouse_Facility_Notes</name>
+        <label>Assign Lighthouse Facility Notes</label>
+        <locationX>502</locationX>
+        <locationY>795</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Lighthouse_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_MCAT_Facility_Notes</name>
+        <label>Assign MCAT Facility Notes</label>
+        <locationX>589</locationX>
+        <locationY>683</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>MCAT_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Monroeville_Facility_Admit_Notes</name>
+        <label>Assign Monroeville Facility Admit Notes</label>
+        <locationX>675</locationX>
+        <locationY>555</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Monroeville_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Raritan_Bay_Facility_Notes</name>
+        <label>Assign Raritan Bay Facility Notes</label>
+        <locationX>760</locationX>
+        <locationY>393</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>RaritanBay_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_St_Charles_Facility_Admit_Notes</name>
+        <label>Assign St. Charles Facility Admit Notes</label>
+        <locationX>862</locationX>
+        <locationY>298</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>StCharles_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Assign_Westminster_Facility_Notes</name>
+        <label>Assign Westminster Facility Notes</label>
+        <locationX>772</locationX>
+        <locationY>166</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Westminster_FacilityAdmitNotes</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>OP_or_MAT_Facility_null</name>
+        <label>OP or MAT Facility - null</label>
+        <locationX>498</locationX>
+        <locationY>50</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Facility_Admission_Notes__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue> </stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Check_Facility</name>
+        <label>Check Facility</label>
+        <locationX>491</locationX>
+        <locationY>281</locationY>
+        <defaultConnector>
+            <targetReference>OP_or_MAT_Facility_null</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Bracebridge_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Bracebridge_Facility_Notes</targetReference>
+            </connector>
+            <label>Bracebridge (IP)</label>
+        </rules>
+        <rules>
+            <name>Danvers_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Danvers_Facility_Notes</targetReference>
+            </connector>
+            <label>Danvers (IP)</label>
+        </rules>
+        <rules>
+            <name>Devon_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Devon_Facility_Notes</targetReference>
+            </connector>
+            <label>Devon (IP)</label>
+        </rules>
+        <rules>
+            <name>Indianapolis_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Indy_Facility_Notes</targetReference>
+            </connector>
+            <label>Indianapolis (IP)</label>
+        </rules>
+        <rules>
+            <name>Lighthouse_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lighthouse (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Lighthouse_Facility_Notes</targetReference>
+            </connector>
+            <label>Lighthouse (IP)</label>
+        </rules>
+        <rules>
+            <name>MCAT_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_MCAT_Facility_Notes</targetReference>
+            </connector>
+            <label>MCAT (IP)</label>
+        </rules>
+        <rules>
+            <name>Monroeville_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Monroeville_Facility_Admit_Notes</targetReference>
+            </connector>
+            <label>Monroeville (IP)</label>
+        </rules>
+        <rules>
+            <name>Raritan_Bay_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Raritan Bay (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Raritan_Bay_Facility_Notes</targetReference>
+            </connector>
+            <label>Raritan Bay (IP)</label>
+        </rules>
+        <rules>
+            <name>St_Charles_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_St_Charles_Facility_Admit_Notes</targetReference>
+            </connector>
+            <label>St. Charles (IP)</label>
+        </rules>
+        <rules>
+            <name>Westminster_IP</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Westminster (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Assign_Westminster_Facility_Notes</targetReference>
+            </connector>
+            <label>Westminster (IP)</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Exit_FinPay_User</name>
+        <label>Exit FinPay User</label>
+        <locationX>321</locationX>
+        <locationY>152</locationY>
+        <defaultConnector>
+            <targetReference>Check_Facility</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Exit_FinPay</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$User.Username</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>finpayapi@recoverycoa.com</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Exit FinPay</label>
+        </rules>
+    </decisions>
+    <description>Refactored from Case to Opportunity - text templates updated and new facilities (STC, INDY, Monroeville) added 2/9/21, default outcome added for OP and MAT, updated WM text
+3/21 - modified text for changing COVID requirements
+6/23 - modified facility text
+8/2 - Exempted FinPay API user from triggering flow</description>
+    <environments>Default</environments>
+    <interviewLabel>Facility Admission Notes Field Update Flow (Opp) {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Facility Admission Notes Field Update Flow (Opp)</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>FREE_FORM_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>4</locationX>
+        <locationY>70</locationY>
+        <connector>
+            <targetReference>Exit_FinPay_User</targetReference>
+        </connector>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>Bracebridge_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Danvers_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Devon_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Indy_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Lighthouse_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>MCAT_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Monroeville_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>RaritanBay_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>StCharles_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <textTemplates>
+        <name>Westminster_FacilityAdmitNotes</name>
+        <isViewedAsPlainText>false</isViewedAsPlainText>
+        <text>&lt;p&gt;&lt;u&gt;Patients can be accepted and admitted if they have tested positive for COVID 19, based on medical necessity and if the risk outweigh the benefits as RCA sites and teams are equipped to maintain positive patients in treatment. &lt;/u&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Once admitted, patients will complete the current recommended time frame and remain in quarantine or isolation as indicated for a total of 7-10 days.&lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;This timeframe ensures the current CDC guidelines of at least 5 days of quarantine are met and will allow the medical and nursing team to safely asses the individuals symptomology and mask compliance in order to safely D/C quarantine.&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;u&gt;Patients who test at any point positive during treatment are subject and recommended to quarantine on site for 5-10 days based on the individual&apos;s symptomology and mask compliance. &lt;/u&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Currently 7 days of quarantine with 3 additional days of mask compliance for all positive and potentially exposed patients has been recommended by the majority of our health car providers to meet all CDC requirements and further mitigate the risk of transmission.&amp;nbsp;&lt;/li&gt;&lt;/ul&gt;</text>
+    </textTemplates>
+    <variables>
+        <name>varFacility</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>store Opportunity ID</description>
+        <name>varOppID</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

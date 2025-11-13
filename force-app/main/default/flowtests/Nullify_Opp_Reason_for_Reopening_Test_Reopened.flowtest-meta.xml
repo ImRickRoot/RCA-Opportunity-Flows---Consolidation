@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Tests Nullify_Opp_Reason_for_Reopening when opportunity is reopened from Closed stage - should clear Reason__c and Specific_Case_Reason__c.</description>
+    <flowApiName>Nullify_Opp_Reason_for_Reopening</flowApiName>
+    <label>Nullify Opp Reason for Reopening - Reopened</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Reopened&quot;,&quot;StageName&quot;:&quot;Closed&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Reason__c&quot;:&quot;Lost&quot;,&quot;Specific_Case_Reason__c&quot;:&quot;No Response&quot;}</sobjectValue>
+            </value>
+        </parameters>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordUpdated</type>
+            <value>
+                <sobjectValue>{&quot;Name&quot;:&quot;Test Opportunity - Reopened&quot;,&quot;StageName&quot;:&quot;Qualification&quot;,&quot;CloseDate&quot;:&quot;2025-12-31&quot;,&quot;Reason__c&quot;:&quot;Lost&quot;,&quot;Specific_Case_Reason__c&quot;:&quot;No Response&quot;}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.Reason__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue></stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

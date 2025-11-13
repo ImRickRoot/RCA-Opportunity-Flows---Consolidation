@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>AUDIT TRAIL: Records the timestamp when an opportunity record is pushed/synced to the FinPay financial system. Triggers after save when Requires_Financial_Clearance__c changes to TRUE and the timestamp field is still blank. Stamps Time_Date_FinPay_File_Pushed__c with the current date/time to create an audit trail of when financial data was transmitted to FinPay. This tracking is critical for financial reconciliation, troubleshooting integration issues, and ensuring timely financial clearance processing. The timestamp is recorded only once to preserve the original push time. Refactored from Case to Opportunity object, migrated from legacy workflow rule.</description>
+    <formulas>
+        <description>Formula that returns the current date and time using the NOW() function. This timestamp captures the exact moment when the opportunity was flagged for financial clearance and pushed to the FinPay system. Used to stamp the Time_Date_FinPay_File_Pushed__c field for audit trail purposes. Returns a DateTime value representing the current system time.</description>
+        <name>FinPay_Push_TimeStampFormula</name>
+        <dataType>DateTime</dataType>
+        <expression>NOW()</expression>
+    </formulas>
+    <label>Pushed to FinPay (Opp)</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Updates the opportunity record with the current timestamp when it's pushed to the FinPay financial system. Stamps Time_Date_FinPay_File_Pushed__c using the NOW() formula to record exactly when the financial clearance data was transmitted. This audit timestamp is captured only once (when field is null) to preserve the original push time. Critical for financial tracking, compliance auditing, and troubleshooting FinPay integration issues. Enables financial team to track processing timelines and identify delays.</description>
+        <name>mainUpdate</name>
+        <label>Record FinPay Push Timestamp</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Time_Date_FinPay_File_Pushed__c</field>
+            <value>
+                <elementReference>FinPay_Push_TimeStampFormula</elementReference>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>mainUpdate</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Requires_Financial_Clearance__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Time_Date_FinPay_File_Pushed__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

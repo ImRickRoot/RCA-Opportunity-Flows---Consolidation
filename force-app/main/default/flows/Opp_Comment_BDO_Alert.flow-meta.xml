@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Sends email notification to the BDO account owner (using BDO_Email__c field) when a new comment is added to an opportunity (Last_Case_Comment__c field changes). This email includes a link to the opportunity record so the BDO can review the comment and take any necessary follow-up action. After sending this email, the flow proceeds to check if the BDO has a manager who should also be notified.</description>
+        <name>Send_Email_to_BDO</name>
+        <label>Send Email to BDO</label>
+        <locationX>182</locationX>
+        <locationY>323</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <connector>
+            <targetReference>Get_BDO_User</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new comment has been added to an Opportunity. Please review the record.</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>Opportunity Comment Alert</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>$Record.BDO_Email__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>1.0.1</versionString>
+    </actionCalls>
+    <actionCalls>
+        <description>Sends a templated email notification to the BDO's manager (if the BDO has a manager assigned) when a comment is added to an opportunity. This ensures management visibility into important opportunity updates. The email uses a pre-defined email template (ID: 00X61000000uBNKEA2) and includes the opportunity record for context. Only executes if the BDO user record has a non-null ManagerId field.</description>
+        <name>Send_Email_to_BDO_Manager</name>
+        <label>Send Email to BDO Manager</label>
+        <locationX>50</locationX>
+        <locationY>647</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>useEmailTemplate</name>
+            <value>
+                <stringValue>True</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailTemplateId</name>
+            <value>
+                <stringValue>00X61000000uBNKEA2</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recipientId</name>
+            <value>
+                <elementReference>Get_BDO_User.ManagerId</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <versionString>1.0.1</versionString>
+    </actionCalls>
+    <apiVersion>56.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Checks if the BDO user has a manager assigned (ManagerId field is not null). If yes, the flow proceeds to send an additional notification to the manager. If no manager exists, the flow ends after notifying only the BDO. This ensures that BDO managers have visibility into important opportunity updates while avoiding unnecessary emails when no manager relationship exists.</description>
+        <name>BDO_Has_a_Manager</name>
+        <label>BDO Has a Manager</label>
+        <locationX>182</locationX>
+        <locationY>539</locationY>
+        <defaultConnectorLabel>No Manager - End Flow</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_BDO_User.ManagerId</leftValueReference>
+                <operator>NotEqualTo</operator>
+            </conditions>
+            <connector>
+                <targetReference>Send_Email_to_BDO_Manager</targetReference>
+            </connector>
+            <label>Yes - Manager Exists</label>
+        </rules>
+    </decisions>
+    <description>BUSINESS PROCESS: Sends automated email notifications to the BDO (Business Development Organization) account owner and their manager (if applicable) when comments are added to opportunities. Triggers when the Last_Case_Comment__c field changes, BDO_Email__c is populated, and the BDO is not excluded (not jwilson@recoverycoa.com). This two-tier notification system ensures both the BDO rep and their manager maintain visibility into important opportunity discussions and updates, supporting relationship management and oversight. Refactored from Case to Opportunity object with manager notification added.</description>
+    <environments>Default</environments>
+    <interviewLabel>Opportunity Comment BDO Alert {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Opportunity Comment BDO Alert</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Queries the User object to retrieve the full user record for the BDO Account Owner, matching on the Name field. This lookup is necessary to access the ManagerId field, which is used in the subsequent decision element to determine if the BDO has a manager who should also be notified. The query automatically stores all retrieved fields for use later in the flow.</description>
+        <name>Get_BDO_User</name>
+        <label>Get BDO User</label>
+        <locationX>182</locationX>
+        <locationY>431</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>BDO_Has_a_Manager</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Name</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.BDO_Account_Owner__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Send_Email_to_BDO</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>BDO_Email__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Last_Case_Comment__c</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>BDO_Email__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>jwilson@recoverycoa.com</stringValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

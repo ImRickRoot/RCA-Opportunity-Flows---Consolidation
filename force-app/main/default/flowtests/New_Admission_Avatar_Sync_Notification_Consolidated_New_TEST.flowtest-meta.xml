@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowTest xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>This is a test to check how the xml file works</description>
+    <flowApiName>New_Admission_Avatar_Sync_Notification_Consolidated</flowApiName>
+    <label>New TEST</label>
+    <testPoints>
+        <elementApiName>Start</elementApiName>
+        <parameters>
+            <leftValueReference>$Record</leftValueReference>
+            <type>InputTriggeringRecordInitial</type>
+            <value>
+                <sobjectValue>{&quot;ACTS_Escalation_DT__c&quot;:&quot;2025-11-13T20:53:00.000Z&quot;,&quot;Accepted_Waitlist_Date_Time__c&quot;:&quot;2025-11-29T20:54:00.000Z&quot;,&quot;Alumni_Involvement__c&quot;:false,&quot;Carrum_Eligible__c&quot;:false,&quot;CloseDate&quot;:&quot;2025-11-28&quot;,&quot;Commitment__c&quot;:false,&quot;Contract_Term__c&quot;:&quot;No Contract&quot;,&quot;Delete_SMS_History__c&quot;:false,&quot;Demographics__c&quot;:false,&quot;E2N__c&quot;:false,&quot;Escalation_Required__c&quot;:false,&quot;Finances__c&quot;:false,&quot;High_Risk_Suicide__c&quot;:false,&quot;High_Risk_Violence__c&quot;:false,&quot;Internal_Review_of_Template__c&quot;:false,&quot;IsEscalated__c&quot;:false,&quot;IsPrivate&quot;:false,&quot;Lost_Reason__c&quot;:&quot;&quot;,&quot;Med_Approval_Status__c&quot;:&quot;Not Submitted for Approval&quot;,&quot;Medical_Clearance_Required__c&quot;:false,&quot;Most_Recent_Patient_Case__c&quot;:false,&quot;Name&quot;:&quot;This is a Test Opp&quot;,&quot;Obtained_Contract_Template__c&quot;:false,&quot;Opt_In_For_Text_Messages__c&quot;:&quot;No&quot;,&quot;OwnerId&quot;:&quot;005Wr00000FLi5RIAT&quot;,&quot;PS_Med_Approval_Status__c&quot;:&quot;Not Submitted for Approval&quot;,&quot;Patient_Intervention_Count__c&quot;:0,&quot;Pre_Screen_Created__c&quot;:false,&quot;Pre_Screen__c&quot;:false,&quot;Priority__c&quot;:&quot;Low&quot;,&quot;Q4C_Clone__c&quot;:false,&quot;Q4C_Record__c&quot;:false,&quot;Readmit__c&quot;:false,&quot;Red_Flags__c&quot;:false,&quot;Requires_Financial_Clearance__c&quot;:false,&quot;Send_Admisson_Assessment_to_Avatar__c&quot;:false,&quot;Send_VOB_to_Avatar__c&quot;:false,&quot;Send_to_Finpay__c&quot;:false,&quot;Sent_for_Internal_Signature__c&quot;:false,&quot;Sent_to_Payor_for_Signature__c&quot;:false,&quot;StageName&quot;:&quot;Qualified Opportunity&quot;,&quot;Sync_to_Avatar__c&quot;:false,&quot;Transfer_from_LH_to_BBH__c&quot;:false,&quot;Transportation_Email_Sent__c&quot;:false,&quot;Transportation_Schedule__c&quot;:false,&quot;Update_Five9_List__c&quot;:false,&quot;Update_Referent_Info_in_Avatar__c&quot;:false,&quot;VOB_Completed__c&quot;:false,&quot;VOB_Created__c&quot;:false,&quot;Validate_Opportunity__c&quot;:false,&quot;Webform_Associated_Case__c&quot;:false,&quot;Webform_Associated_Opportunity__c&quot;:false,&quot;tdc_tsw__SMS_Opt_out__c&quot;:false}</sobjectValue>
+            </value>
+        </parameters>
+    </testPoints>
+    <testPoints>
+        <assertions>
+            <conditions>
+                <leftValueReference>$Record.BDO_Case_Owner__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue></stringValue>
+                </rightValue>
+            </conditions>
+        </assertions>
+        <elementApiName>Finish</elementApiName>
+    </testPoints>
+</FlowTest>

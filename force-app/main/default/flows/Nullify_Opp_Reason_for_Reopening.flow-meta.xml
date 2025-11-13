@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>DATA QUALITY: Automatically clears the Reason__c and Specific_Case_Reason__c fields when an opportunity is reopened (IsClosed changes to False). Triggers before save on opportunities with RecordType 'Case_2_0'. These fields capture the reason for closing an opportunity, so they must be cleared when the opportunity reopens to allow for new closure reasons to be entered. Without this cleanup, stale closure reasons would persist and cause confusion about why the opportunity was actually closed. Ensures data accuracy and prevents misleading closure information on reopened opportunities. Refactored from Case to Opportunity object.</description>
+    <label>Nullify Opportunity Reason for Reopening</label>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <description>Clears both Reason__c and Specific_Case_Reason__c fields by setting them to empty strings (null). This cleanup occurs before the record is saved, ensuring these closure-related fields are blank when the opportunity reopens. Allows users to enter fresh, accurate closure information if the opportunity is closed again in the future. Prevents confusion from outdated closure reasons remaining visible on active opportunities.</description>
+        <name>mainUpdate</name>
+        <label>Clear Closure Reason Fields</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>Reason__c</field>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Specific_Case_Reason__c</field>
+            <value>
+                <stringValue></stringValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>mainUpdate</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>{!$Record.IsClosed} =  False &amp;&amp; {!$Record.RecordType.Name} = &apos;Case_2_0&apos;</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,1227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>64.0</apiVersion>
+    <label>Opportunity_Admission_Processing_Management_After_Save</label>
+    <interviewLabel>Opportunity_Admission_Processing_Management_After_Save {!$Flow.CurrentDateTime}</interviewLabel>
+    <description>This flow replaces Auto_Close_Med_Approvals_on_Opp_Closure, Add_BDO_to_Opp_flow, and the facility notification flows (BBH_OP_ONLY_New_Admission_Opp, BBH_New_Admission_Opp, Capital_Region_New_Admit_Opp, Capital_Region_New_OP_Admit_Opp, Danvers_New_Admit_Opp, Danvers_New_OP_Admit_Opp, Devon_New_Admit_Opp, Greenville_New_Admit_Opp, Greenville_OP_Admit_Opp, Indy_New_Admit_Opp, Indy_New_OP_Admit_Opp, Monroeville_New_Admit_Opp, Monroeville_New_OP_Admit_Opp, New_Admit_LH_IP_Opp, RB_New_Admit_Opp, St_Charles_New_Admit_Opp, St_Charles_New_OP_Admit_Opp, Westminster_New_Admit_Opp). We close medical approvals via a helper subflow, sync the BDO owner on creates or referent changes, and deliver the correct emailSimple alert so each site or program can act immediately.</description>
+    <processType>AutoLaunchedFlow</processType>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <decisions>
+        <name>Route_Admission_Emails</name>
+        <label>Route Admission Emails</label>
+        <description>Choose the right notification email based on the facility and sync status.</description>
+        <locationX>320</locationX>
+        <locationY>620</locationY>
+        <defaultConnectorLabel>No Matching Criteria</defaultConnectorLabel>
+        <rules>
+            <name>Bracebridge_IP</name>
+            <label>Bracebridge IP</label>
+            <description>Send the Bracebridge IP admission email so the site can process the sync.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_BBH_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Bracebridge_OP</name>
+            <label>Bracebridge OP</label>
+            <description>Send the Bracebridge OP admission email when the record syncs to Avatar.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Bracebridge (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_BBH_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Capital_Region_IP</name>
+            <label>Capital Region IP</label>
+            <description>Send the MCAT IP notifications when the Capital Region IP opportunity syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_MCAT_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Capital_Region_OP</name>
+            <label>Capital Region OP</label>
+            <description>Send the Capital Region OP admission email when the opportunity syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>MCAT (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Capital_Region_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Danvers_IP</name>
+            <label>Danvers or BCAT IP</label>
+            <description>Send the Danvers IP admission email for Danvers or BCAT inpatient facilities.</description>
+            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>BCAT (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Danvers_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Danvers_OP</name>
+            <label>Danvers OP</label>
+            <description>Send the Danvers OP admission email when the record syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Danvers (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Danvers_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Devon_IP</name>
+            <label>Devon IP</label>
+            <description>Send the Devon IP admission email for synced opportunities.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Devon (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Devon_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Greenville_IP</name>
+            <label>Greenville IP</label>
+            <description>Send the Greenville IP admission email when the record syncs to Avatar.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Greenville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Greenville_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Greenville_OP</name>
+            <label>Greenville OP</label>
+            <description>Send the Greenville OP admission email for outpatient syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Greenville (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Greenville_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Indianapolis_IP</name>
+            <label>Indianapolis IP</label>
+            <description>Send the Indianapolis IP admission email when the record syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Indy_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Indianapolis_OP</name>
+            <label>Indianapolis OP</label>
+            <description>Send the Indianapolis OP admission email for outpatient syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Indianapolis (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Indy_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Monroeville_IP</name>
+            <label>Monroeville IP</label>
+            <description>Send the Monroeville IP admission email for synced IP opportunities.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Monroeville_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Monroeville_OP</name>
+            <label>Monroeville OP</label>
+            <description>Send the Monroeville OP admission email for outpatient syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Monroeville (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Monroeville_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Lighthouse_IP</name>
+            <label>Lighthouse IP</label>
+            <description>Send the Lighthouse IP admission email when the record syncs.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Lighthouse (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Lighthouse_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Raritan_Bay_IP</name>
+            <label>Raritan Bay IP</label>
+            <description>Send the Raritan Bay IP admission email when the record syncs to Avatar.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Raritan Bay (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Raritan_Bay_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>St_Charles_IP</name>
+            <label>St. Charles IP</label>
+            <description>Send the St. Charles IP admission email for synced IP opportunities.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_St_Charles_IP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>St_Charles_OP</name>
+            <label>St. Charles or South Elgin OP</label>
+            <description>Send the St. Charles or South Elgin OP admission email when the record syncs.</description>
+            <conditionLogic>1 AND (2 OR 3)</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>St. Charles (OP)</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>South Elgin (OP MH/ED)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_St_Charles_OP_Email</targetReference>
+            </connector>
+        </rules>
+        <rules>
+            <name>Westminster_IP</name>
+            <label>Westminster IP</label>
+            <description>Send the Westminster IP admission email for synced opportunities.</description>
+            <conditionLogic>1 AND 2</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Sync_to_Avatar__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.Facility__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Westminster (IP)</stringValue>
+                </rightValue>
+            </conditions>
+            <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+            <connector>
+                <targetReference>Send_Westminster_IP_Email</targetReference>
+            </connector>
+        </rules>
+    </decisions>
+    <subflows>
+        <name>Call_Close_Med_Approvals</name>
+        <label>Call Close Med Approvals</label>
+        <description>We call the helper flow that closes related medical approvals when the opportunity closes.</description>
+        <locationX>120</locationX>
+        <locationY>200</locationY>
+        <connector>
+            <targetReference>Call_Assign_BDO</targetReference>
+        </connector>
+        <flowName>Opportunity_Med_Approvals_Close_Helper</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </subflows>
+    <subflows>
+        <name>Call_Assign_BDO</name>
+        <label>Call Assign BDO</label>
+        <description>We call the helper that applies the correct BDO owner when the referent is set or changed.</description>
+        <locationX>320</locationX>
+        <locationY>400</locationY>
+        <connector>
+            <targetReference>Route_Admission_Emails</targetReference>
+        </connector>
+        <flowName>Opportunity_BDO_Assignment_Helper</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>referentId</name>
+            <value>
+                <elementReference>$Record.Referent__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>isNewOpportunity</name>
+            <value>
+                <elementReference>IsNewOpportunity</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>referentChanged</name>
+            <value>
+                <elementReference>IsReferentChanged</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <name>referentOwnerId</name>
+            <value>
+                <elementReference>$Record.Referent__r.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </subflows>
+    <formulas>
+        <name>IsNewOpportunity</name>
+        <description>Indicates whether the current transaction is creating the opportunity.</description>
+        <dataType>Boolean</dataType>
+        <expression>ISNEW()</expression>
+    </formulas>
+    <formulas>
+        <name>IsReferentChanged</name>
+        <description>Indicates whether the Referent lookup changed on this save.</description>
+        <dataType>Boolean</dataType>
+        <expression>ISCHANGED({!$Record.Referent__c})</expression>
+    </formulas>
+    <actionCalls>
+        <name>Send_BBH_IP_Email</name>
+        <label>Send BBH IP Email</label>
+        <description>We send the Bracebridge IP admission email so the team knows to review the synced record.</description>
+        <locationX>80</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>bracebridge@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Bracebridge IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new Bracebridge IP admission has been synced to Avatar.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_BBH_OP_Email</name>
+        <label>Send BBH OP Email</label>
+        <description>We send the Bracebridge OP admission email so outpatient staff can process the sync.</description>
+        <locationX>200</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>bracebridge@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Bracebridge OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new Bracebridge OP admission has been synced to Avatar.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_MCAT_IP_Email</name>
+        <label>Send MCAT IP Email</label>
+        <description>We send the MCAT IP admission email so their team reviews the synced record.</description>
+        <locationX>320</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <connector>
+            <targetReference>Send_Capital_Region_IP_Email</targetReference>
+        </connector>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>mcat@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New MCAT IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new MCAT IP admission has been synced to Avatar.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Capital_Region_IP_Email</name>
+        <label>Send Capital Region IP Email</label>
+        <description>We send the Capital Region nursing and admissions email so they can act on the IP sync.</description>
+        <locationX>440</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>capitalregion@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Capital Region IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new Capital Region IP admission has been synced to Avatar.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Capital_Region_OP_Email</name>
+        <label>Send Capital Region OP Email</label>
+        <description>We send the Capital Region OP admission email so outpatient staff can follow up.</description>
+        <locationX>560</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>capitalregion@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Capital Region OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new Capital Region OP admission has been synced to Avatar.
+
+Opportunity Number: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Patient: {!$Record.Account.Name}
+Stage: {!$Record.StageName}
+
+Please review and process accordingly.</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Danvers_IP_Email</name>
+        <label>Send Danvers IP Email</label>
+        <description>We send the Danvers IP admission email so the Danvers and BCAT teams can respond.</description>
+        <locationX>680</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>danvers@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Danvers/BCAT IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Danvers_OP_Email</name>
+        <label>Send Danvers OP Email</label>
+        <description>We send the Danvers OP admission email so the outpatient team can take action.</description>
+        <locationX>800</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>danvers@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Danvers OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new OP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Devon_IP_Email</name>
+        <label>Send Devon IP Email</label>
+        <description>We send the Devon IP admission email so their team sees the Avatar sync.</description>
+        <locationX>920</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>devon@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Devon IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Greenville_IP_Email</name>
+        <label>Send Greenville IP Email</label>
+        <description>We send the Greenville IP admission email so staff can follow up.</description>
+        <locationX>1040</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>greenville@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Greenville IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Greenville_OP_Email</name>
+        <label>Send Greenville OP Email</label>
+        <description>We send the Greenville OP admission email so outpatient staff receive the notice.</description>
+        <locationX>1160</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>greenville@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Greenville OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new OP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Indy_IP_Email</name>
+        <label>Send Indy IP Email</label>
+        <description>We send the Indianapolis IP admission email for Avatar syncs.</description>
+        <locationX>1280</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>indianapolis@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Indianapolis IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Indy_OP_Email</name>
+        <label>Send Indy OP Email</label>
+        <description>We send the Indianapolis OP admission email so outpatient staff are informed.</description>
+        <locationX>1400</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>indianapolis@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Indianapolis OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new OP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Monroeville_IP_Email</name>
+        <label>Send Monroeville IP Email</label>
+        <description>We send the Monroeville IP admission email when the record syncs.</description>
+        <locationX>1520</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>monroeville@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Monroeville IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Monroeville_OP_Email</name>
+        <label>Send Monroeville OP Email</label>
+        <description>We send the Monroeville OP admission email for outpatient syncs.</description>
+        <locationX>1640</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>monroeville@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Monroeville OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new OP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Lighthouse_IP_Email</name>
+        <label>Send Lighthouse IP Email</label>
+        <description>We send the Lighthouse IP admission email when the record syncs.</description>
+        <locationX>1760</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>lighthouse@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Lighthouse IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Raritan_Bay_IP_Email</name>
+        <label>Send Raritan Bay IP Email</label>
+        <description>We send the Raritan Bay IP admission email so their team can review the sync.</description>
+        <locationX>1880</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>raritanbay@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Raritan Bay IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_St_Charles_IP_Email</name>
+        <label>Send St. Charles IP Email</label>
+        <description>We send the St. Charles IP admission email so the site teams react quickly.</description>
+        <locationX>2000</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>stcharles@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New St. Charles IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_St_Charles_OP_Email</name>
+        <label>Send St. Charles OP Email</label>
+        <description>We send the St. Charles and South Elgin OP admission email for outpatient syncs.</description>
+        <locationX>2120</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>stcharles@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New St. Charles / South Elgin OP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new OP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <actionCalls>
+        <name>Send_Westminster_IP_Email</name>
+        <label>Send Westminster IP Email</label>
+        <description>We send the Westminster IP admission email when the record syncs.</description>
+        <locationX>2240</locationX>
+        <locationY>820</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <stringValue>westminster@recoverycoa.com</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <stringValue>New Westminster IP Admission - Opportunity {!$Record.Name}</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <stringValue>A new IP admission has been synced to Avatar.
+
+Opportunity: {!$Record.Name}
+Facility: {!$Record.Facility__c}
+Account: {!$Record.Account.Name}
+Opportunity ID: {!$Record.Id}</stringValue>
+            </value>
+        </inputParameters>
+    </actionCalls>
+    <start>
+        <locationX>320</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Call_Close_Med_Approvals</targetReference>
+        </connector>
+        <filterLogic>1 OR 2 OR 3</filterLogic>
+        <filters>
+            <field>Sync_to_Avatar__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>StageName</field>
+            <operator>IsChanged</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Referent__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
+
+
